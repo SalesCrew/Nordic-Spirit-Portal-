@@ -20,7 +20,9 @@ export default function EventCard({ event }: Props) {
               fill
               className="object-cover"
             />
-          ) : null}
+          ) : (
+            <div className="absolute inset-0 grid place-items-center text-gray-300 text-sm">No cover</div>
+          )}
         </div>
         <CardBody>
           <div className="text-sm text-gray-500">Event</div>

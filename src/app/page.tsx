@@ -9,8 +9,7 @@ async function fetchEvents(): Promise<Event[]> {
     const { data } = await supabase
       .from('events')
       .select('id, name, cover_url, created_at, is_active')
-      .order('created_at', { ascending: false })
-      .eq('is_active', true);
+      .order('created_at', { ascending: false });
     return data ?? [];
   } catch {
     return [];
