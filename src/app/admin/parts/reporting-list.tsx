@@ -53,12 +53,18 @@ export default function ReportingList() {
       ) : items.length === 0 ? (
         <div className="text-gray-500">No reportings yet.</div>
       ) : (
-        <div className="space-y-2">
+        <div className="grid grid-cols-5 gap-3">
           {items.map((r) => (
-            <div key={r.id} className="card p-4">
-              <div className="text-sm text-gray-500 mb-1">{new Date(r.created_at).toLocaleString()}</div>
-              <div className="font-medium mb-2">{r.event_name ?? r.event_id}</div>
-              <pre className="text-xs bg-muted p-2 rounded-md overflow-auto max-h-64">{JSON.stringify(r.answers, null, 2)}</pre>
+            <div key={r.id} className="card p-3 rounded-lg">
+              <div className="text-[11px] text-gray-500 mb-1">{new Date(r.created_at).toLocaleString()}</div>
+              <div className="text-sm font-medium mb-2 line-clamp-1">{r.event_name ?? r.event_id}</div>
+              <div className="space-y-1 text-xs text-gray-700">
+                <div className="flex justify-between"><span className="text-gray-500">Name:</span><span className="truncate max-w-[110px] text-right">{r.answers?.promoter_name ?? '—'}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Datum:</span><span>{r.answers?.work_date ?? '—'}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Zeit:</span><span>{r.answers?.start_time ?? '—'}–{r.answers?.leave_time ?? '—'}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Frequenz:</span><span>{r.answers?.frequenz ?? '—'}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">Kontakte:</span><span>{r.answers?.kontakte_count ?? '—'}</span></div>
+              </div>
             </div>
           ))}
         </div>
