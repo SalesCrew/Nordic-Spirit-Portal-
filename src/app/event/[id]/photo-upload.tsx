@@ -53,12 +53,6 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
           onChange={onChange}
           className="input"
         />
-        <div className="mt-3 flex items-center gap-2">
-          <button className="btn-gradient" disabled={uploading}>
-            {uploading ? 'Uploading...' : 'Upload'}
-          </button>
-          {message && <div className="text-sm text-gray-500">{message}</div>}
-        </div>
       </div>
       {uploaded.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
@@ -70,6 +64,12 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
           ))}
         </div>
       )}
+      <div className="mt-3 flex items-center gap-2">
+        <button className="btn-gradient" disabled={uploading}>
+          {uploading ? 'Uploading...' : 'Upload'}
+        </button>
+        {message && <div className="text-sm text-gray-500">{message}</div>}
+      </div>
     </div>
   );
 }
