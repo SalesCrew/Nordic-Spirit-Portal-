@@ -46,10 +46,19 @@ export default function CreateEvent() {
         </div>
         <div>
           <label className="label">Cover image</label>
-          <input type="file" accept="image/*" className="input" onChange={(e) => setCover(e.target.files?.[0] ?? null)} />
+          <label className="btn-black w-fit cursor-pointer">
+            <input
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => setCover(e.target.files?.[0] ?? null)}
+            />
+            Datei auswählen
+          </label>
+          {cover && <div className="text-xs text-gray-500 mt-1">{cover.name}</div>}
         </div>
       </div>
-      <button className="btn-primary mt-3" disabled={creating}>{creating ? 'Creating...' : 'Create event'}</button>
+      <button className="btn-gradient mt-3" disabled={creating}>{creating ? 'Creating...' : 'Create event'}</button>
       {message && <div className="text-sm text-gray-500 mt-2">{message}</div>}
     </form>
   );
