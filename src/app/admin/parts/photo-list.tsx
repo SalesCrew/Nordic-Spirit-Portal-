@@ -102,8 +102,7 @@ export default function PhotoList() {
         
         
         </div>
-          <button className="btn-ghost" onClick={onDownloadJson}>Download JSON</button>
-        </div>
+        <button className="btn-ghost" onClick={onDownloadJson}>Download JSON</button>
       </div>
       {loading ? (
         <div className="text-gray-500">Loading...</div>
