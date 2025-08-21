@@ -12,13 +12,11 @@ const FREQUENCIES = [
   { label: 'Sehr schwach', value: 'sehr_schwach' }
 ] as const;
 
-const TIME_24H = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
 const ReportingSchema = z.object({
   promoter_name: z.string().min(1),
   work_date: z.string().min(1),
-  start_time: z.string().regex(TIME_24H, 'HH:MM'),
-  leave_time: z.string().regex(TIME_24H, 'HH:MM'),
+  start_time: z.string().min(1),
+  leave_time: z.string().min(1),
   frequenz: z.enum(FREQUENCIES.map(f => f.value) as [string, ...string[]]),
   kontakte_count: z.string().min(1),
   pause_minutes: z.string().optional().default(''),
@@ -102,9 +100,6 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
           <label className="label">Dienstbeginn</label>
           <input
             className="input"
-            placeholder="HH:MM"
-            inputMode="numeric"
-            pattern="([01]\\d|2[0-3]):([0-5]\\d)"
             value={values.start_time}
             onChange={(e) => onChange('start_time', e.target.value)}
           />
@@ -113,9 +108,6 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
           <label className="label">Uhrzeit verlassen</label>
           <input
             className="input"
-            placeholder="HH:MM"
-            inputMode="numeric"
-            pattern="([01]\\d|2[0-3]):([0-5]\\d)"
             value={values.leave_time}
             onChange={(e) => onChange('leave_time', e.target.value)}
           />
