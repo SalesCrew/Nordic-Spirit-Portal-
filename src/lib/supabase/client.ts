@@ -11,7 +11,11 @@ export const supabaseBrowser = () => {
     throw new Error('Supabase env not configured');
   }
   return createClient(url, key, {
-    auth: { persistSession: false }
+    auth: { persistSession: false },
+    global: {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: 'no-store', next: { revalidate: 0 } as any })
+    }
   });
 };
 
