@@ -3,12 +3,22 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
+const FREQUENCIES = [
+  { label: 'Sehr stark', value: 'sehr_stark' },
+  { label: 'Stark', value: 'stark' },
+  { label: 'Mittel', value: 'mittel' },
+  { label: 'Schwach', value: 'schwach' },
+  { label: 'Sehr schwach', value: 'sehr_schwach' }
+] as const;
+
 const ReportingSchema = z.object({
-  team_size: z.string().min(1),
+  promoter_name: z.string().min(1),
+  work_date: z.string().min(1),
   start_time: z.string().min(1),
-  end_time: z.string().min(1),
-  stock_delivered: z.string().min(1),
-  samples_given: z.string().min(1),
+  leave_time: z.string().min(1),
+  frequenz: z.enum(FREQUENCIES.map(f => f.value) as [string, ...string[]]),
+  kontakte_count: z.string().min(1),
+  pause_minutes: z.string().optional().default(''),
   notes: z.string().optional()
 });
 
@@ -17,11 +27,13 @@ type ReportingValues = z.infer<typeof ReportingSchema>;
 export default function ReportingForm({ eventId }: { eventId: string }) {
   const supabase = supabaseBrowser();
   const [values, setValues] = useState<ReportingValues>({
-    team_size: '',
+    promoter_name: '',
+    work_date: '',
     start_time: '',
-    end_time: '',
-    stock_delivered: '',
-    samples_given: '',
+    leave_time: '',
+    frequenz: 'mittel',
+    kontakte_count: '',
+    pause_minutes: '',
     notes: ''
   });
   const [submitting, setSubmitting] = useState(false);
@@ -33,14 +45,25 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
     setError(null);
     const parse = ReportingSchema.safeParse(values);
     if (!parse.success) {
-      setError('Please fill all required fields');
+      setError('Bitte alle Pflichtfelder ausfüllen');
       return;
     }
     setSubmitting(true);
     try {
-      const { error: insertError } = await supabase
-        .from('reportings')
-        .insert({ event_id: eventId, answers: values });
+      const payload = {
+        event_id: eventId,
+        answers: values,
+        promoter_name: values.promoter_name,
+        work_date: values.work_date,
+        dienstbeginn: values.start_time,
+        frequenz: values.frequenz as any,
+        kontakte_count: Number(values.kontakte_count) || null,
+        pause: values.pause_minutes ? true : false,
+        pause_minutes: values.pause_minutes ? Number(values.pause_minutes) || null : null,
+        leave_time: values.leave_time,
+        notes: values.notes ?? null
+      };
+      const { error: insertError } = await supabase.from('reportings').insert(payload);
       if (insertError) throw insertError;
       setSubmitted(true);
     } catch (err: any) {
@@ -55,43 +78,73 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
   }
 
   if (submitted) {
-    return <div className="card p-4">Thanks! Your reporting was submitted.</div>;
+    return <div className="card p-4">Danke! Dein Reporting wurde gesendet.</div>;
   }
 
   return (
     <form onSubmit={onSubmit} className="card p-4 space-y-3">
-      <div>
-        <label className="label">Team size</label>
-        <input className="input" value={values.team_size} onChange={(e) => onChange('team_size', e.target.value)} />
-      </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="label">Start time</label>
+          <label className="label">Name Mitarbeiter</label>
+          <input className="input" value={values.promoter_name} onChange={(e) => onChange('promoter_name', e.target.value)} />
+        </div>
+        <div>
+          <label className="label">Datum</label>
+          <input type="date" className="input" value={values.work_date} onChange={(e) => onChange('work_date', e.target.value)} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="label">Dienstbeginn</label>
           <input type="time" className="input" value={values.start_time} onChange={(e) => onChange('start_time', e.target.value)} />
         </div>
         <div>
-          <label className="label">End time</label>
-          <input type="time" className="input" value={values.end_time} onChange={(e) => onChange('end_time', e.target.value)} />
+          <label className="label">Uhrzeit verlassen</label>
+          <input type="time" className="input" value={values.leave_time} onChange={(e) => onChange('leave_time', e.target.value)} />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="label">Stock delivered</label>
-          <input className="input" value={values.stock_delivered} onChange={(e) => onChange('stock_delivered', e.target.value)} />
-        </div>
-        <div>
-          <label className="label">Samples given</label>
-          <input className="input" value={values.samples_given} onChange={(e) => onChange('samples_given', e.target.value)} />
-        </div>
-      </div>
+
       <div>
-        <label className="label">Notes</label>
-        <textarea className="input min-h-[80px]" value={values.notes} onChange={(e) => onChange('notes', e.target.value)} />
+        <label className="label block mb-1">Frequenz</label>
+        <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full max-w-md">
+          <div
+            className="absolute top-1 bottom-1 rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out"
+            style={{ width: `${100 / FREQUENCIES.length}%`, transform: `translateX(${FREQUENCIES.findIndex(f=>f.value===values.frequenz)*(100/FREQUENCIES.length)}%)` }}
+          />
+          {FREQUENCIES.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              onClick={() => onChange('frequenz', f.value)}
+              className={`relative z-10 flex-1 py-2 text-sm font-medium transition-colors ${values.frequenz === f.value ? 'text-gray-900' : 'text-gray-500'}`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-3 gap-3">
+        <div>
+          <label className="label">Anzahl Kontakte</label>
+          <input className="input" inputMode="numeric" value={values.kontakte_count} onChange={(e) => onChange('kontakte_count', e.target.value)} />
+        </div>
+        <div>
+          <label className="label">Pause (Minuten)</label>
+          <input className="input" inputMode="numeric" placeholder="z.B. 30" value={values.pause_minutes} onChange={(e) => onChange('pause_minutes', e.target.value)} />
+        </div>
+        <div className="col-span-3 md:col-span-1 hidden"></div>
+      </div>
+
+      <div>
+        <label className="label">Anmerkungen</label>
+        <textarea className="input min-h-[100px]" value={values.notes} onChange={(e) => onChange('notes', e.target.value)} />
       </div>
       {error && <div className="text-sm text-red-600">{error}</div>}
-      <div className="pt-2">
-        <button className="btn-primary" disabled={submitting}>
-          {submitting ? 'Submitting...' : 'Submit reporting'}
+      <div className="pt-2 flex justify-end">
+        <button className="btn-gradient" disabled={submitting}>
+          {submitting ? 'Sende...' : 'Reporting senden'}
         </button>
       </div>
     </form>
