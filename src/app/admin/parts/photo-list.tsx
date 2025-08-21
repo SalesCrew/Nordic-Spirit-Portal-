@@ -63,46 +63,43 @@ export default function PhotoList() {
     <section>
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-medium">Photos</h2>
-        <div className="flex items-center gap-2 relative">
-          <button
-            ref={btnRef}
-            type="button"
-            className="input flex items-center justify-between min-w-[160px] cursor-pointer"
-            onClick={() => setOpen((v) => !v)}
-          >
-            <span className="truncate">{currentLabel}</span>
-            <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="ml-2 text-gray-500">
-              <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-          {open && (
-            <div ref={menuRef} className="absolute right-0 top-full mt-1 z-50 bg-white rounded-md shadow-[0_2px_16px_rgba(0,0,0,0.08)] overflow-hidden min-w-[200px]">
-              <div
-                role="button"
-                className="px-3 py-2 text-sm hover:bg-gradient-to-r hover:from-[#2B91FF]/50 hover:to-[#0047FF]/50"
-                onClick={() => { setEventFilter('all'); setOpen(false); }}
-              >
-                All events
-              </div>
-              {events.map((ev) => (
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <button
+              ref={btnRef}
+              type="button"
+              className="input w-56 flex items-center justify-between cursor-pointer"
+              onClick={() => setOpen((v) => !v)}
+            >
+              <span className="truncate">{currentLabel}</span>
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="ml-2 text-gray-500">
+                <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            {open && (
+              <div ref={menuRef} className="absolute right-0 top-full mt-1 z-50 bg-white rounded-md shadow-[0_2px_16px_rgba(0,0,0,0.08)] overflow-hidden w-56">
                 <div
-                  key={ev.id}
                   role="button"
                   className="px-3 py-2 text-sm hover:bg-gradient-to-r hover:from-[#2B91FF]/50 hover:to-[#0047FF]/50"
-                  onClick={() => { setEventFilter(ev.id); setOpen(false); }}
+                  onClick={() => { setEventFilter('all'); setOpen(false); }}
                 >
-                  {ev.name}
+                  All events
                 </div>
-              ))}
-            </div>
-          )}
-        
-        
-        
-        
-        
+                {events.map((ev) => (
+                  <div
+                    key={ev.id}
+                    role="button"
+                    className="px-3 py-2 text-sm hover:bg-gradient-to-r hover:from-[#2B91FF]/50 hover:to-[#0047FF]/50"
+                    onClick={() => { setEventFilter(ev.id); setOpen(false); }}
+                  >
+                    {ev.name}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <button className="btn-ghost" onClick={onDownloadJson}>Download JSON</button>
         </div>
-        <button className="btn-ghost" onClick={onDownloadJson}>Download JSON</button>
       </div>
       {loading ? (
         <div className="text-gray-500">Loading...</div>
