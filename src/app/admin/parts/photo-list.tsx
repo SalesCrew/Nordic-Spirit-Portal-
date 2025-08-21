@@ -47,7 +47,7 @@ export default function PhotoList() {
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-medium">Photos</h2>
         <div className="flex items-center gap-2">
-          <select className="input" value={eventFilter} onChange={(e) => setEventFilter(e.target.value)}>
+          <select className="input clean-dropdown" value={eventFilter} onChange={(e) => setEventFilter(e.target.value)}>
             <option value="all">All events</option>
             {events.map((ev) => (
               <option key={ev.id} value={ev.id}>{ev.name}</option>
