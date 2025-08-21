@@ -7,9 +7,9 @@ export default function EventSwitcher({ eventId }: { eventId: string }) {
   const [tab, setTab] = useState<'photos' | 'reporting'>('photos');
 
   return (
-    <div className="space-y-4">
-      <div className="relative w-full max-w-xs">
-        <div className="relative flex rounded-md border border-border bg-white p-1 select-none">
+    <div className="space-y-4 max-w-2xl">
+      <div className="relative w-full">
+        <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full">
           <div
             className={
               `absolute top-1 bottom-1 w-1/2 rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out ` +

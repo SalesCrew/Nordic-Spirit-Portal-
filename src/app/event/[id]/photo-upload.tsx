@@ -2,10 +2,13 @@
 import { useCallback, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
+type Uploaded = { url: string; id: string };
+
 export default function PhotoUpload({ eventId }: { eventId: string }) {
   const supabase = supabaseBrowser();
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [uploaded, setUploaded] = useState<Uploaded[]>([]);
 
   const onChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -26,6 +29,8 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
           .from('photos')
           .insert({ event_id: eventId, storage_path: path });
         if (insertError) throw insertError;
+        const url = supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
+        setUploaded((prev) => [{ url, id: path }, ...prev].slice(0, 12));
       });
       await Promise.all(tasks);
       setMessage('Uploaded successfully.');
@@ -38,19 +43,33 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
   }, [eventId, supabase]);
 
   return (
-    <div className="card p-4">
-      <label className="label mb-2">Select photos</label>
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={onChange}
-        className="input"
-      />
-      <button className="btn-primary mt-3" disabled={uploading}>
-        {uploading ? 'Uploading...' : 'Upload'}
-      </button>
-      {message && <div className="text-sm text-gray-500 mt-2">{message}</div>}
+    <div className="card p-4 rounded-lg">
+      <div className="mb-3">
+        <label className="label mb-2 block">Select photos</label>
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={onChange}
+          className="input"
+        />
+        <div className="mt-3 flex items-center gap-2">
+          <button className="btn-gradient" disabled={uploading}>
+            {uploading ? 'Uploading...' : 'Upload'}
+          </button>
+          {message && <div className="text-sm text-gray-500">{message}</div>}
+        </div>
+      </div>
+      {uploaded.length > 0 && (
+        <div className="grid grid-cols-3 gap-2">
+          {uploaded.map((u) => (
+            <div key={u.id} className="relative aspect-square overflow-hidden rounded-md bg-muted">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={u.url} alt="uploaded" className="object-cover w-full h-full" />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
