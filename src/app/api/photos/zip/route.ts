@@ -34,7 +34,8 @@ export async function GET(req: NextRequest) {
     }
 
     const content = await zip.generateAsync({ type: 'uint8array' });
-    return new Response(content, {
+    const blob = new Blob([content], { type: 'application/zip' });
+    return new Response(blob, {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="${eventId}.zip"`
