@@ -28,17 +28,7 @@ export default async function AdminPage() {
         {configured ? (
           <>
             <CreateEvent />
-            <section>
-              <h2 className="text-lg font-medium mb-2">Events</h2>
-              <div className="grid grid-cols-2 gap-4">
-                {events.map((e) => (
-                  <a key={e.id} href={`/event/${e.id}`} className="card p-4">
-                    <div className="text-sm text-gray-500">Event</div>
-                    <div className="text-lg font-semibold">{e.name}</div>
-                  </a>
-                ))}
-              </div>
-            </section>
+            {/* Events grid removed per request; selection via dropdown only */}
             <PhotoList />
             <ReportingList />
           </>
