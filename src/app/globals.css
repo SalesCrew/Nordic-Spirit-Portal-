@@ -48,7 +48,7 @@ body {
 }
 
 .btn-gradient {
-  @apply btn text-white bg-gradient-to-r from-[#2B91FF] to-[#0047FF] hover:opacity-95 rounded-lg;
+  @apply btn text-white bg-gradient-to-r from-[#2B91FF] to-[#0047FF] hover:opacity-95 rounded-md;
 }
 
 /* Style the native file input button only */
@@ -58,7 +58,7 @@ input[type="file"]::file-selector-button {
   border: 0;
   border-radius: 0.375rem;
   color: #fff;
-  background-image: linear-gradient(135deg, #1f1f1f, #000000);
+  background-image: linear-gradient(135deg, #262626, #000000);
   cursor: pointer;
 }
 input[type="file"]::file-selector-button:hover {
