@@ -11,11 +11,13 @@ const FREQUENCIES = [
   { label: 'Sehr schwach', value: 'sehr_schwach' }
 ] as const;
 
+const TIME_24H = /^([01]\d|2[0-3]):([0-5]\d)$/;
+
 const ReportingSchema = z.object({
   promoter_name: z.string().min(1),
   work_date: z.string().min(1),
-  start_time: z.string().min(1),
-  leave_time: z.string().min(1),
+  start_time: z.string().regex(TIME_24H, 'HH:MM'),
+  leave_time: z.string().regex(TIME_24H, 'HH:MM'),
   frequenz: z.enum(FREQUENCIES.map(f => f.value) as [string, ...string[]]),
   kontakte_count: z.string().min(1),
   pause_minutes: z.string().optional().default(''),
@@ -97,11 +99,25 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="label">Dienstbeginn</label>
-          <input type="time" className="input" value={values.start_time} onChange={(e) => onChange('start_time', e.target.value)} />
+          <input
+            className="input"
+            placeholder="HH:MM"
+            inputMode="numeric"
+            pattern="([01]\\d|2[0-3]):([0-5]\\d)"
+            value={values.start_time}
+            onChange={(e) => onChange('start_time', e.target.value)}
+          />
         </div>
         <div>
           <label className="label">Uhrzeit verlassen</label>
-          <input type="time" className="input" value={values.leave_time} onChange={(e) => onChange('leave_time', e.target.value)} />
+          <input
+            className="input"
+            placeholder="HH:MM"
+            inputMode="numeric"
+            pattern="([01]\\d|2[0-3]):([0-5]\\d)"
+            value={values.leave_time}
+            onChange={(e) => onChange('leave_time', e.target.value)}
+          />
         </div>
       </div>
 
@@ -109,15 +125,15 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
         <label className="label block mb-1">Frequenz</label>
         <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full max-w-md">
           <div
-            className="absolute top-1 bottom-1 rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-300 ease-out"
-            style={{ width: `${100 / FREQUENCIES.length}%`, transform: `translateX(${FREQUENCIES.findIndex(f=>f.value===values.frequenz)*(100/FREQUENCIES.length)}%)` }}
+            className="absolute top-1 bottom-1 left-1 rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out"
+            style={{ width: `${100 / FREQUENCIES.length}%`, transform: `translateX(${FREQUENCIES.findIndex(f=>f.value===values.frequenz)*100}%)` }}
           />
           {FREQUENCIES.map((f) => (
             <button
               key={f.value}
               type="button"
               onClick={() => onChange('frequenz', f.value)}
-              className={`relative z-10 flex-1 py-2 text-sm font-medium transition-colors ${values.frequenz === f.value ? 'text-gray-900' : 'text-gray-500'}`}
+              className={`relative z-10 flex-1 py-2 text-sm font-medium transition-colors ${values.frequenz === f.value ? 'text-gray-900' : 'text-gray-600'}`}
             >
               {f.label}
             </button>
@@ -125,7 +141,7 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="label">Anzahl Kontakte</label>
           <input className="input" inputMode="numeric" value={values.kontakte_count} onChange={(e) => onChange('kontakte_count', e.target.value)} />
@@ -134,7 +150,6 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
           <label className="label">Pause (Minuten)</label>
           <input className="input" inputMode="numeric" placeholder="z.B. 30" value={values.pause_minutes} onChange={(e) => onChange('pause_minutes', e.target.value)} />
         </div>
-        <div className="col-span-3 md:col-span-1 hidden"></div>
       </div>
 
       <div>

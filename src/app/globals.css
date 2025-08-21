@@ -85,4 +85,9 @@ input[type="file"]::file-selector-button:hover {
   background: linear-gradient(90deg, rgba(43,145,255,0.5), rgba(0,71,255,0.5));
 }
 
+/* Calendar and time inputs - minimalist white */
+input[type="date"], input[type="time"], input[type="datetime-local"] {
+  background-color: #ffffff;
+}
+
 
