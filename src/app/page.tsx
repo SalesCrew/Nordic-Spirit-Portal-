@@ -24,7 +24,9 @@ export default async function HomePage() {
         <div className="text-center text-gray-500 pt-32">No events available yet.</div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          {events.map((ev) => (
+          {events
+            .filter((ev) => ev.name.toLowerCase() !== 'temp')
+            .map((ev) => (
             <EventCard key={ev.id} event={ev} />
           ))}
         </div>

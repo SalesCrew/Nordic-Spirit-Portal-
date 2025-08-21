@@ -26,7 +26,7 @@ export default function EventCard({ event }: Props) {
         </div>
         <CardBody>
           <div className="text-sm text-gray-500">Event</div>
-          <div className="text-lg font-semibold">{event.name}</div>
+          <div className="text-lg font-semibold truncate" title={event.name}>{event.name}</div>
         </CardBody>
       </Card>
     </Link>

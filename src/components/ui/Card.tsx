@@ -5,7 +5,7 @@ export function Card({ children }: PropsWithChildren) {
 }
 
 export function CardBody({ children }: PropsWithChildren) {
-  return <div className="p-4">{children}</div>;
+  return <div className="p-4 h-[88px]">{children}</div>;
 }
 
 export function CardHeader({ children }: PropsWithChildren) {
