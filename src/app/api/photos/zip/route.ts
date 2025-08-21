@@ -34,7 +34,9 @@ export async function GET(req: NextRequest) {
     }
 
     const content = await zip.generateAsync({ type: 'uint8array' });
-    const blob = new Blob([content], { type: 'application/zip' });
+    // Recreate with a fresh ArrayBuffer to satisfy Blob typing (ArrayBuffer, not ArrayBufferLike)
+    const ab = new Uint8Array(content).buffer as ArrayBuffer;
+    const blob = new Blob([ab], { type: 'application/zip' });
     return new Response(blob, {
       headers: {
         'Content-Type': 'application/zip',
