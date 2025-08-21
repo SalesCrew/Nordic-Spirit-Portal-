@@ -7,7 +7,7 @@ export default function EventSwitcher({ eventId }: { eventId: string }) {
   const [tab, setTab] = useState<'photos' | 'reporting'>('photos');
 
   return (
-    <div className="space-y-4 max-w-2xl">
+    <div className="space-y-4 max-w-2xl w-full">
       <div className="relative w-full">
         <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full">
           <div

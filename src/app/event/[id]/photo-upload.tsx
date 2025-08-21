@@ -43,7 +43,7 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
   }, [eventId, supabase]);
 
   return (
-    <div className="card p-4 rounded-lg">
+    <div className="card p-4 rounded-lg w-full">
       <div className="mb-3">
         <label className="label mb-2 block">Select photos</label>
         <input
