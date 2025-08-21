@@ -64,11 +64,11 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
           ))}
         </div>
       )}
-      <div className="mt-3 flex items-center gap-2">
+      <div className="mt-3 flex items-center justify-between">
+        {message && <div className="text-sm text-gray-500">{message}</div>}
         <button className="btn-gradient" disabled={uploading}>
           {uploading ? 'Uploading...' : 'Upload'}
         </button>
-        {message && <div className="text-sm text-gray-500">{message}</div>}
       </div>
     </div>
   );
