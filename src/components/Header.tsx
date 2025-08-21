@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { useRef } from 'react';
-import { Settings } from 'lucide-react';
+import { User2 } from 'lucide-react';
 
 export default function Header() {
   const timer = useRef<number | null>(null);
@@ -34,9 +34,9 @@ export default function Header() {
         <Link
           href="/admin"
           className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-opacity opacity-60 hover:opacity-100"
-          aria-label="Admin"
+          aria-label="Admin login"
         >
-          <Settings size={18} />
+          <User2 size={18} />
         </Link>
       </div>
     </header>
