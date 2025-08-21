@@ -126,10 +126,17 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
         <label className="label block mb-1">Frequenz</label>
         <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full max-w-md">
           <div
-            className="absolute top-1 bottom-1 left-1 rounded-md bg-gradient-to-r from-[#2B91FF]/20 to-[#0047FF]/20 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out"
+            className="absolute top-1 bottom-1 left-1 rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out"
             style={{
               width: `calc(${100 / FREQUENCIES.length}% - 2px)`,
-              transform: `translateX(calc(${FREQUENCIES.findIndex(f=>f.value===values.frequenz)} * (100% + 2px)))`
+              transform: (() => {
+                const idx = FREQUENCIES.findIndex(f => f.value === values.frequenz);
+                // keep first three exactly as-is
+                if (idx <= 2) return `translateX(calc(${idx} * (100% + 2px)))`;
+                // for last two, clamp to container to avoid overflow
+                if (idx === 3) return `translateX(calc(3 * (100% + 2px)))`;
+                return `translateX(calc(4 * (100% + 2px)))`;
+              })()
             }}
           />
           {FREQUENCIES.map((f) => (

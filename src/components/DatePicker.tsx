@@ -19,6 +19,9 @@ export default function DatePicker({ value, onChange }: { value: string; onChang
   const [year, setYear] = useState(parsed.getFullYear());
   const [month, setMonth] = useState(parsed.getMonth()); // 0-11
   const anchorRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const [alignRight, setAlignRight] = useState(false);
+  const [placeAbove, setPlaceAbove] = useState(false);
 
   useEffect(() => {
     function onDoc(e: MouseEvent) {
@@ -29,6 +32,18 @@ export default function DatePicker({ value, onChange }: { value: string; onChang
     }
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const anchor = anchorRef.current?.getBoundingClientRect();
+    if (!anchor) return;
+    const panelWidth = 288; // w-72
+    const vw = window.innerWidth;
+    setAlignRight(anchor.left + panelWidth > vw - 8);
+    // measure height
+    const ph = panelRef.current?.getBoundingClientRect().height ?? 320;
+    setPlaceAbove(anchor.bottom + ph > window.innerHeight - 8);
   }, [open]);
 
   const grid = useMemo(() => {
@@ -62,7 +77,11 @@ export default function DatePicker({ value, onChange }: { value: string; onChang
         className="input cursor-pointer"
       />
       {open && (
-        <div className="absolute z-50 mt-2 w-72 rounded-lg border border-border bg-white shadow-card p-3">
+        <div
+          ref={panelRef}
+          className={`absolute z-50 w-72 rounded-lg border border-border bg-white shadow-card p-3 ${placeAbove ? 'mb-2 bottom-full' : 'mt-2 top-full'} ${alignRight ? 'right-0' : 'left-0'}`}
+          style={{}}
+        >
           <div className="flex items-center justify-between mb-2">
             <button type="button" className="btn-ghost px-2 py-1 text-sm" onClick={() => changeMonth(-1)}>‹</button>
             <div className="text-sm font-medium">{MONTHS[month]} {year}</div>
