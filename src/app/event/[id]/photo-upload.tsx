@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
 type Uploaded = { url: string; id: string };
@@ -9,14 +9,22 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [uploaded, setUploaded] = useState<Uploaded[]>([]);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const onChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
+    setPendingFiles(Array.from(files));
+    setMessage(`${files.length} file(s) ready to upload`);
+  }, []);
+
+  const onUpload = useCallback(async () => {
+    if (pendingFiles.length === 0) return;
     setUploading(true);
     setMessage(null);
     try {
-      const tasks = Array.from(files).map(async (file) => {
+      const tasks = pendingFiles.map(async (file) => {
         const unique = (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
           ? crypto.randomUUID()
           : String(Date.now());
@@ -30,17 +38,19 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
           .insert({ event_id: eventId, storage_path: path });
         if (insertError) throw insertError;
         const url = supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
-        setUploaded((prev) => [{ url, id: path }, ...prev].slice(0, 12));
+        return { url, id: path } as Uploaded;
       });
-      await Promise.all(tasks);
+      const results = await Promise.all(tasks);
+      setUploaded((prev) => [...results, ...prev].slice(0, 12));
       setMessage('Uploaded successfully.');
+      setPendingFiles([]);
+      if (inputRef.current) inputRef.current.value = '';
     } catch (err: any) {
       setMessage(err?.message ?? 'Upload failed');
     } finally {
       setUploading(false);
-      (e.target as HTMLInputElement).value = '';
     }
-  }, [eventId, supabase]);
+  }, [pendingFiles, eventId, supabase]);
 
   return (
     <div className="card p-4 rounded-lg w-full">
@@ -52,6 +62,7 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
           multiple
           onChange={onChange}
           className="input"
+          ref={inputRef}
         />
       </div>
       {uploaded.length > 0 && (
@@ -66,7 +77,7 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
       )}
       <div className="mt-3 flex items-center justify-end gap-2 w-full">
         {message && <div className="text-sm text-gray-500">{message}</div>}
-        <button className="btn-gradient ml-auto" disabled={uploading}>
+        <button className="btn-gradient ml-auto" disabled={uploading || pendingFiles.length === 0} onClick={onUpload}>
           {uploading ? 'Uploading...' : 'Upload'}
         </button>
       </div>

@@ -106,7 +106,7 @@ export default function PhotoList() {
       ) : visible.length === 0 ? (
         <div className="text-gray-500">No photos yet.</div>
       ) : (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2 max-w-2xl">
           {visible.map((p) => {
             const url = publicUrl(p.storage_path);
             const title = eventIdToName.get(p.event_id) ?? p.event_id;
