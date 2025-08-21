@@ -32,7 +32,7 @@ export default function Header() {
           Nordic Spirit Portal
         </div>
         <Link
-          href="/admin"
+          href="/login"
           className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-opacity opacity-60 hover:opacity-100"
           aria-label="Admin login"
         >
