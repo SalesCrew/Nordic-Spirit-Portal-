@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { z } from 'zod';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import DatePicker from '@/components/DatePicker';
 
 const FREQUENCIES = [
   { label: 'Sehr stark', value: 'sehr_stark' },
@@ -92,7 +93,7 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
         </div>
         <div>
           <label className="label">Datum</label>
-          <input type="date" className="input" value={values.work_date} onChange={(e) => onChange('work_date', e.target.value)} />
+          <DatePicker value={values.work_date} onChange={(val) => onChange('work_date', val)} />
         </div>
       </div>
 
@@ -125,8 +126,11 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
         <label className="label block mb-1">Frequenz</label>
         <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full max-w-md">
           <div
-            className="absolute top-1 bottom-1 left-1 rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out"
-            style={{ width: `${100 / FREQUENCIES.length}%`, transform: `translateX(${FREQUENCIES.findIndex(f=>f.value===values.frequenz)*100}%)` }}
+            className="absolute top-1 bottom-1 left-1 rounded-md bg-gradient-to-r from-[#2B91FF]/20 to-[#0047FF]/20 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out"
+            style={{
+              width: `calc(${100 / FREQUENCIES.length}% - 2px)`,
+              transform: `translateX(calc(${FREQUENCIES.findIndex(f=>f.value===values.frequenz)} * (100% + 2px)))`
+            }}
           />
           {FREQUENCIES.map((f) => (
             <button
