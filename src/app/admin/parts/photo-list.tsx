@@ -99,6 +99,9 @@ export default function PhotoList() {
             )}
           </div>
           <button className="btn-ghost" onClick={onDownloadJson}>Download JSON</button>
+          <a className="btn-ghost" href={`/api/photos/zip?eventId=${eventFilter === 'all' ? '' : eventFilter}`} download>
+            Download ZIP
+          </a>
         </div>
       </div>
       {loading ? (

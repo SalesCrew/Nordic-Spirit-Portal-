@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
+import * as XLSX from 'xlsx';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
 type Item = {
@@ -32,12 +33,29 @@ export default function ReportingList() {
     })();
   }, [supabase]);
 
-  async function downloadJson() {
-    const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+  async function downloadExcel() {
+    const rows = items.map((r) => ({
+      id: r.id,
+      event: r.event_name ?? r.event_id,
+      created_at: new Date(r.created_at).toLocaleString(),
+      promoter_name: r.answers?.promoter_name ?? '',
+      work_date: r.answers?.work_date ?? '',
+      start_time: r.answers?.start_time ?? '',
+      leave_time: r.answers?.leave_time ?? '',
+      frequenz: r.answers?.frequenz ?? '',
+      kontakte_count: r.answers?.kontakte_count ?? '',
+      pause_minutes: r.answers?.pause_minutes ?? '',
+      notes: r.answers?.notes ?? r.answers?.notes ?? r.answers?.notes ?? ''
+    }));
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, 'Reportings');
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'reportings.json';
+    a.download = 'reportings.xlsx';
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -46,7 +64,7 @@ export default function ReportingList() {
     <section>
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-medium">Reportings</h2>
-        <button className="btn-ghost" onClick={downloadJson}>Download JSON</button>
+        <button className="btn-ghost" onClick={downloadExcel}>Download Excel</button>
       </div>
       {loading ? (
         <div className="text-gray-500">Loading...</div>
