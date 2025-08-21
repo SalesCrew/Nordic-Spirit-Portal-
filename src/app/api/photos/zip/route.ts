@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
     // List all storage objects under prefix `${eventId}/`
     while (true) {
-      const { data, error } = await supabase.storage.from('photos').list(eventId + '/', { limit: pageSize, offset: page * pageSize });
+      const { data, error } = await supabase.storage.from('photos').list(eventId + '/', { limit: pageSize, offset: page * pageSize, sortBy: { column: 'name', order: 'asc' } });
       if (error) throw error;
       const files = data ?? [];
       for (const f of files) {

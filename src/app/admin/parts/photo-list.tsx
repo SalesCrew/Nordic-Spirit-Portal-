@@ -34,15 +34,9 @@ export default function PhotoList() {
     return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
   }
 
-  function onDownloadJson() {
-    const payload = visible.map((p) => ({ ...p, url: publicUrl(p.storage_path), event_name: eventIdToName.get(p.event_id) }));
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'photos.json';
-    a.click();
-    URL.revokeObjectURL(url);
+  function onDownloadZip() {
+    if (eventFilter === 'all') return;
+    window.location.href = `/api/photos/zip?eventId=${eventFilter}`;
   }
 
   const currentLabel = eventFilter === 'all' ? 'All events' : (eventIdToName.get(eventFilter) ?? 'Event');
@@ -98,10 +92,9 @@ export default function PhotoList() {
               </div>
             )}
           </div>
-          <button className="btn-ghost" onClick={onDownloadJson}>Download JSON</button>
-          <a className="btn-ghost" href={`/api/photos/zip?eventId=${eventFilter === 'all' ? '' : eventFilter}`} download>
+          <button className={`btn-ghost ${eventFilter === 'all' ? 'opacity-50 cursor-not-allowed' : ''}`} onClick={onDownloadZip} disabled={eventFilter === 'all'}>
             Download ZIP
-          </a>
+          </button>
         </div>
       </div>
       {loading ? (
