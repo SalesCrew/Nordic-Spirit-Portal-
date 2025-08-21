@@ -3,8 +3,8 @@ import { isSupabaseConfigured, supabaseBrowser } from '@/lib/supabase/client';
 import { Event } from '@/types/db';
 import AdminLogin from './parts/login';
 import CreateEvent from './parts/create-event';
-import ReportingList from './parts/reporting-list';
-import PhotoList from './parts/photo-list';
+import FilterWrapper from './parts/FilterWrapper';
+import { useState } from 'react';
 
 async function fetchEvents(): Promise<Event[]> {
   const supabase = supabaseBrowser();
@@ -18,6 +18,8 @@ async function fetchEvents(): Promise<Event[]> {
 export default async function AdminPage() {
   const configured = isSupabaseConfigured();
   const events = configured ? await fetchEvents() : [];
+  const initialFilter = 'all';
+  // Note: we can't use hooks in async server components directly, so leave filter to child client components.
   return (
     <main className="container-padded py-6">
       <div className="mb-4">
@@ -29,8 +31,7 @@ export default async function AdminPage() {
           <>
             <CreateEvent />
             {/* Events grid removed per request; selection via dropdown only */}
-            <PhotoList />
-            <ReportingList />
+            <FilterWrapper />
           </>
         ) : (
           <div className="card p-4">

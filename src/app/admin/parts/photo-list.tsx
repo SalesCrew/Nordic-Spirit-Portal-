@@ -5,12 +5,11 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 type Photo = { id: string; event_id: string; storage_path: string; created_at: string };
 type Event = { id: string; name: string };
 
-export default function PhotoList() {
+export default function PhotoList({ eventFilter, onChangeEventFilter }: { eventFilter: string; onChangeEventFilter: (v: string) => void }) {
   const supabase = supabaseBrowser();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [eventFilter, setEventFilter] = useState<string>('all');
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -75,7 +74,7 @@ export default function PhotoList() {
                 <div
                   role="button"
                   className="px-3 py-2 text-sm hover:bg-gradient-to-r hover:from-[#2B91FF]/50 hover:to-[#0047FF]/50"
-                  onClick={() => { setEventFilter('all'); setOpen(false); }}
+                  onClick={() => { onChangeEventFilter('all'); setOpen(false); }}
                 >
                   All events
                 </div>
@@ -84,7 +83,7 @@ export default function PhotoList() {
                     key={ev.id}
                     role="button"
                     className="px-3 py-2 text-sm hover:bg-gradient-to-r hover:from-[#2B91FF]/50 hover:to-[#0047FF]/50"
-                    onClick={() => { setEventFilter(ev.id); setOpen(false); }}
+                    onClick={() => { onChangeEventFilter(ev.id); setOpen(false); }}
                   >
                     {ev.name}
                   </div>

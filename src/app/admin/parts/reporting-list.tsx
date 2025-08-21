@@ -11,7 +11,7 @@ type Item = {
   event_name?: string;
 };
 
-export default function ReportingList() {
+export default function ReportingList({ eventFilter }: { eventFilter: string }) {
   const supabase = supabaseBrowser();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +34,8 @@ export default function ReportingList() {
   }, [supabase]);
 
   async function downloadExcel() {
-    const rows = items.map((r) => ({
+    const list = eventFilter === 'all' ? items : items.filter((r) => r.event_id === eventFilter);
+    const rows = list.map((r) => ({
       id: r.id,
       event: r.event_name ?? r.event_id,
       created_at: new Date(r.created_at).toLocaleString(),
@@ -60,6 +61,8 @@ export default function ReportingList() {
     URL.revokeObjectURL(url);
   }
 
+  const filtered = eventFilter === 'all' ? items : items.filter((r) => r.event_id === eventFilter);
+
   return (
     <section>
       <div className="flex items-center justify-between mb-2">
@@ -68,11 +71,11 @@ export default function ReportingList() {
       </div>
       {loading ? (
         <div className="text-gray-500">Loading...</div>
-      ) : items.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="text-gray-500">No reportings yet.</div>
       ) : (
         <div className="grid grid-cols-5 gap-3">
-          {items.map((r) => (
+          {filtered.map((r) => (
             <div key={r.id} className="card p-3 rounded-lg">
               <div className="text-[11px] text-gray-500 mb-1">{new Date(r.created_at).toLocaleString()}</div>
               <div className="text-sm font-medium mb-2 line-clamp-1">{r.event_name ?? r.event_id}</div>

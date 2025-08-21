@@ -100,6 +100,7 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
           <label className="label">Dienstbeginn</label>
           <input
             className="input"
+            placeholder="HH:MM"
             value={values.start_time}
             onChange={(e) => onChange('start_time', e.target.value)}
           />
@@ -108,6 +109,7 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
           <label className="label">Uhrzeit verlassen</label>
           <input
             className="input"
+            placeholder="HH:MM"
             value={values.leave_time}
             onChange={(e) => onChange('leave_time', e.target.value)}
           />
