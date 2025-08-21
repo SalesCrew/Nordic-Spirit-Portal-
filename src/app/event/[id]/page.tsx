@@ -3,8 +3,7 @@ import Link from 'next/link';
 import { isSupabaseConfigured, supabaseBrowser } from '@/lib/supabase/client';
 import { Event } from '@/types/db';
 import { Suspense } from 'react';
-import PhotoUpload from './photo-upload';
-import ReportingForm from './reporting-form';
+import EventSwitcher from './switcher';
 
 async function fetchEvent(id: string): Promise<Event | null> {
   try {
@@ -29,24 +28,9 @@ export default async function EventPage({ params }: { params: { id: string } }) 
         <Link href="/" className="text-sm text-gray-500">← Back</Link>
         <h1 className="text-xl font-semibold">{event.name}</h1>
       </div>
-      <div className="sticky top-0 z-10 bg-white">
-        <nav className="flex gap-2 border-b border-border pb-2">
-          <a href="#photos" className="btn-ghost text-sm">Photos</a>
-          <a href="#reporting" className="btn-ghost text-sm">Reporting</a>
-        </nav>
-      </div>
-      <section id="photos" className="py-4">
-        <h2 className="text-lg font-medium mb-2">Upload photos</h2>
-        <Suspense>
-          <PhotoUpload eventId={event.id} />
-        </Suspense>
-      </section>
-      <section id="reporting" className="py-4">
-        <h2 className="text-lg font-medium mb-2">Workday reporting</h2>
-        <Suspense>
-          <ReportingForm eventId={event.id} />
-        </Suspense>
-      </section>
+      <Suspense>
+        <EventSwitcher eventId={event.id} />
+      </Suspense>
     </main>
   );
 }
