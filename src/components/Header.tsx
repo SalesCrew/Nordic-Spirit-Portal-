@@ -1,10 +1,11 @@
 "use client";
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { User2 } from 'lucide-react';
 
 export default function Header() {
   const timer = useRef<number | null>(null);
+  const [showCustomerLogin, setShowCustomerLogin] = useState(false);
 
   function handlePointerDown() {
     timer.current = window.setTimeout(() => {
@@ -31,15 +32,81 @@ export default function Header() {
         >
           Nordic Spirit Portal
         </div>
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-opacity opacity-60 hover:opacity-100"
-          aria-label="Admin login"
-        >
-          <User2 size={18} />
-        </Link>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowCustomerLogin(true)}
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors opacity-50 hover:opacity-75"
+            aria-label="Customer login"
+          >
+            JTI
+          </button>
+          <Link
+            href="/login"
+            className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-opacity opacity-60 hover:opacity-100"
+            aria-label="Admin login"
+          >
+            <User2 size={18} />
+          </Link>
+        </div>
+        {showCustomerLogin && (
+          <CustomerLoginModal onClose={() => setShowCustomerLogin(false)} />
+        )}
       </div>
     </header>
+  );
+}
+
+function CustomerLoginModal({ onClose }: { onClose: () => void }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    // Accept any email/password for now
+    setTimeout(() => {
+      window.location.href = '/customer';
+    }, 500);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="card w-full max-w-sm p-4 bg-white">
+          <h3 className="text-lg font-semibold mb-3">Customer Login</h3>
+          <form onSubmit={onSubmit} className="space-y-3">
+            <div>
+              <label className="label">Email</label>
+              <input 
+                className="input" 
+                type="email"
+                value={email} 
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label className="label">Password</label>
+              <input 
+                className="input" 
+                type="password"
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            <div className="pt-2 flex items-center justify-end gap-2">
+              <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>
+              <button type="submit" className="btn-gradient" disabled={loading}>
+                {loading ? 'Logging in...' : 'Login'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
 
