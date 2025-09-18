@@ -17,6 +17,7 @@ export default function PhotoList({ eventFilter, onChangeEventFilter, kundenMode
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const btnRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -34,6 +35,10 @@ export default function PhotoList({ eventFilter, onChangeEventFilter, kundenMode
 
   const eventIdToName = useMemo(() => new Map(events.map((ev) => [ev.id, ev.name])), [events]);
   const visible = useMemo(() => (eventFilter === 'all' ? photos : photos.filter((p) => p.event_id === eventFilter)), [photos, eventFilter]);
+  
+  // Show first 3 rows (approximately 21 photos) by default
+  const photosToShow = showAll ? visible : visible.slice(0, 21);
+  const hasMorePhotos = visible.length > 21;
 
   function publicUrl(path: string) {
     return supabase.storage.from('photos').getPublicUrl(path).data.publicUrl;
@@ -107,8 +112,9 @@ export default function PhotoList({ eventFilter, onChangeEventFilter, kundenMode
       ) : visible.length === 0 ? (
         <div className="text-gray-500">No photos yet.</div>
       ) : (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2">
-          {visible.map((p) => {
+        <>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-2">
+            {photosToShow.map((p) => {
             const url = publicUrl(p.storage_path);
             const title = eventIdToName.get(p.event_id) ?? p.event_id;
             const isSelected = selectedPhotos?.has(p.id) || false;
@@ -136,7 +142,32 @@ export default function PhotoList({ eventFilter, onChangeEventFilter, kundenMode
               </div>
             );
           })}
-        </div>
+          </div>
+          {hasMorePhotos && (
+            <div className="flex justify-center mt-4">
+              <button 
+                className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+                onClick={() => setShowAll(!showAll)}
+              >
+                {showAll ? (
+                  <>
+                    Show less
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="text-gray-500">
+                      <path d="M15 13l-5-5-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </>
+                ) : (
+                  <>
+                    Show all ({visible.length} photos)
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="text-gray-500">
+                      <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </section>
   );
