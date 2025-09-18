@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { User2 } from 'lucide-react';
+import CustomerLogin from './CustomerLogin';
 
 export default function Header() {
   const timer = useRef<number | null>(null);
@@ -50,63 +51,9 @@ export default function Header() {
         </div>
       </div>
       {showCustomerLogin && (
-        <CustomerLoginModal onClose={() => setShowCustomerLogin(false)} />
+        <CustomerLogin onClose={() => setShowCustomerLogin(false)} />
       )}
     </header>
-  );
-}
-
-function CustomerLoginModal({ onClose }: { onClose: () => void }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    // Accept any email/password for now
-    setTimeout(() => {
-      window.location.href = '/customer';
-    }, 500);
-  }
-
-  return (
-    <div className="fixed inset-0 z-[9999]">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div className="card w-full max-w-sm p-4 bg-white relative z-[10000] shadow-2xl">
-          <h3 className="text-lg font-semibold mb-3">Customer Login</h3>
-          <form onSubmit={onSubmit} className="space-y-3">
-            <div>
-              <label className="label">Email</label>
-              <input 
-                className="input" 
-                type="email"
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <label className="label">Password</label>
-              <input 
-                className="input" 
-                type="password"
-                value={password} 
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="pt-2 flex items-center justify-end gap-2">
-              <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>
-              <button type="submit" className="btn-gradient" disabled={loading}>
-                {loading ? 'Logging in...' : 'Login'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
   );
 }
 
