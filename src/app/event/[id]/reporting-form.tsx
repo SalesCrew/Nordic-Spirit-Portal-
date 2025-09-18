@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { z } from 'zod';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import DatePicker from '@/components/DatePicker';
+import TimePicker from '@/components/TimePicker';
 
 const FREQUENCIES = [
   { label: 'Sehr stark', value: 'sehr_stark' },
@@ -98,20 +99,18 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="label">Dienstbeginn</label>
-          <input
-            className="input"
-            placeholder="HH:MM"
+          <TimePicker
             value={values.start_time}
-            onChange={(e) => onChange('start_time', e.target.value)}
+            onChange={(val) => onChange('start_time', val)}
+            placeholder="HH:MM"
           />
         </div>
         <div>
           <label className="label">Uhrzeit verlassen</label>
-          <input
-            className="input"
-            placeholder="HH:MM"
+          <TimePicker
             value={values.leave_time}
-            onChange={(e) => onChange('leave_time', e.target.value)}
+            onChange={(val) => onChange('leave_time', val)}
+            placeholder="HH:MM"
           />
         </div>
       </div>
@@ -120,16 +119,12 @@ export default function ReportingForm({ eventId }: { eventId: string }) {
         <label className="label block mb-1">Frequenz</label>
         <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full max-w-md">
           <div
-            className="absolute top-1 bottom-1 left-1 rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out"
+            className="absolute top-1 bottom-1 left-1 right-1 rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)]"
             style={{
-              width: `calc(${100 / FREQUENCIES.length}% - 2px)`,
+              width: `calc(${100 / FREQUENCIES.length}% - 4px)`,
               transform: (() => {
                 const idx = FREQUENCIES.findIndex(f => f.value === values.frequenz);
-                // keep first three exactly as-is
-                if (idx <= 2) return `translateX(calc(${idx} * (100% + 2px)))`;
-                // for last two, clamp to container to avoid overflow
-                if (idx === 3) return `translateX(calc(3 * (100% + 2px)))`;
-                return `translateX(calc(4 * (100% + 2px)))`;
+                return `translateX(calc(${idx} * (100% + 2px)))`;
               })()
             }}
           />
