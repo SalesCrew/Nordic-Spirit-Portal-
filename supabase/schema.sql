@@ -79,6 +79,14 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 do $$ begin
+  create policy update_photos_public on public.photos for update using (true) with check (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy delete_photos_public on public.photos for delete using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
   create policy insert_reportings on public.reportings for insert with check (true);
 exception when duplicate_object then null; end $$;
 
@@ -91,6 +99,21 @@ do $$ begin
   create policy read_reportings_public on public.reportings for select using (true);
 exception when duplicate_object then null; end $$;
 
--- Storage policies intentionally omitted here to avoid ownership errors in SQL editor
+-- Storage policies for photos bucket
+do $$ begin
+  create policy photos_public_read on storage.objects for select using (bucket_id = 'photos');
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy photos_public_insert on storage.objects for insert with check (bucket_id = 'photos');
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy photos_public_update on storage.objects for update using (bucket_id = 'photos') with check (bucket_id = 'photos');
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy photos_public_delete on storage.objects for delete using (bucket_id = 'photos');
+exception when duplicate_object then null; end $$;
 
 
