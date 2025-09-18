@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
+import WelcomeNotification from '@/components/WelcomeNotification';
 
 export const metadata: Metadata = {
   title: 'Nordic Spirit Portal',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={inter.variable}>
       <body className="min-h-screen antialiased text-gray-900">
         <Header />
+        <WelcomeNotification />
         <div className="pt-2">{children}</div>
       </body>
     </html>
