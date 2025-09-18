@@ -13,9 +13,9 @@ export default function CustomerDashboard() {
   return (
     <main className="container-padded py-6">
       <div className="mb-4">
-        <Link href="/" className="text-sm text-gray-500">← Back</Link>
+        <Link href="/" className="btn-danger text-sm">Logout</Link>
       </div>
-      <h1 className="text-xl font-semibold mb-6">Customer Dashboard</h1>
+      <h1 className="text-xl font-semibold mb-6">JTI Kunden Dashboard</h1>
       
       <div className="grid grid-cols-7 gap-2">
         {tempEvents.map((event) => (

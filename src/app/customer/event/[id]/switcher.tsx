@@ -19,7 +19,7 @@ const tempReportings = [
     frequenz: 'stark',
     kontakte_count: '45',
     pause_minutes: '30',
-    notes: 'Sehr erfolgreicher Tag mit vielen interessierten Kunden. Besonders das neue Produkt kam gut an. Wetter war perfekt für Outdoor-Aktivitäten.',
+    notes: 'Sehr erfolgreicher Tag mit vielen interessierten Kunden. Besonders das neue Produkt kam gut an. Wetter war perfekt für Outdoor-Aktivitäten. Die Standortauswahl war optimal und die Passantenfrequenz hoch. Mehrere Kunden zeigten großes Interesse an unseren Angeboten und buchten direkt vor Ort. Das Team war motiviert und professionell. Einige Kunden fragten nach weiteren Terminen und Standorten. Die Zusammenarbeit mit dem lokalen Management verlief reibungslos. Insgesamt ein sehr zufriedenstellender Arbeitstag mit guten Ergebnissen.',
   },
   {
     id: '2',
@@ -31,7 +31,7 @@ const tempReportings = [
     frequenz: 'mittel',
     kontakte_count: '32',
     pause_minutes: '45',
-    notes: 'Guter Tag mit stabilen Verkaufszahlen. Einige Rückfragen zu Preisen und Verfügbarkeit.',
+    notes: 'Guter Tag mit stabilen Verkaufszahlen. Einige Rückfragen zu Preisen und Verfügbarkeit. Das Wetter war wechselhaft, was die Kundenfrequenz zeitweise beeinträchtigte. Trotzdem konnten wir mehrere erfolgreiche Gespräche führen und neue Kontakte knüpfen. Die Produktpräsentation wurde gut angenommen. Einige Kunden baten um Informationsmaterial zum Mitnehmen. Die Logistik funktionierte einwandfrei und alle benötigten Materialien waren verfügbar. Gegen Abend stieg die Besucherfrequenz deutlich an.',
   },
   {
     id: '3',
@@ -43,7 +43,7 @@ const tempReportings = [
     frequenz: 'sehr_stark',
     kontakte_count: '67',
     pause_minutes: '20',
-    notes: 'Außergewöhnlich starker Tag! Viele spontane Käufe und positive Reaktionen.',
+    notes: 'Außergewöhnlich starker Tag! Viele spontane Käufe und positive Reaktionen. Der Standort war perfekt gewählt und die Sichtbarkeit optimal. Bereits am frühen Morgen bildeten sich kleine Warteschlangen. Die Kunden waren sehr aufgeschlossen und interessiert an unseren Produkten. Besonders die Neukunden zeigten großes Interesse. Das Feedback war durchweg positiv und mehrere Kunden empfahlen uns direkt weiter. Die Teamarbeit war hervorragend und alle Abläufe funktionierten reibungslos. Dieser Tag übertraf alle Erwartungen und wird sicher als Referenz für zukünftige Events dienen.',
   },
 ];
 
@@ -108,7 +108,7 @@ export default function CustomerEventSwitcher({ eventId }: { eventId: string }) 
                   <div className="flex justify-between"><span className="text-gray-500 font-medium">Pause:</span><span>{r.pause_minutes} min</span></div>
                   <div className="mt-3">
                     <div className="text-gray-500 font-medium text-xs mb-1">Anmerkungen:</div>
-                    <div className="text-xs text-gray-600 leading-relaxed scrollbar-hide max-h-20 overflow-y-auto">{r.notes}</div>
+                    <div className="text-xs text-gray-600 leading-relaxed scrollbar-hide max-h-24 overflow-y-auto">{r.notes}</div>
                   </div>
                 </div>
               </div>
