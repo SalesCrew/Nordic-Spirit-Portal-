@@ -1,9 +1,11 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabaseBrowser } from '@/lib/supabase/client';
 
 export default function CustomerLoginPage() {
 	const router = useRouter();
+	const supabase = supabaseBrowser();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -13,10 +15,30 @@ export default function CustomerLoginPage() {
 		e.preventDefault();
 		setLoading(true);
 		setError(null);
-		// Accept any email/password for now
-		setTimeout(() => {
+		
+		try {
+			// Check if user exists in customer_users table
+			const { data: customerUser } = await supabase
+				.from('customer_users')
+				.select('id, email, is_active')
+				.eq('email', email)
+				.eq('is_active', true)
+				.single();
+			
+			if (!customerUser) {
+				setError('Access denied. Please contact your administrator.');
+				setLoading(false);
+				return;
+			}
+			
+			// For now, accept any password for valid customer emails
+			// Store customer session info
+			sessionStorage.setItem('customer_user', JSON.stringify(customerUser));
 			router.replace('/customer');
-		}, 500);
+		} catch (err: any) {
+			setError('Access denied. Please contact your administrator.');
+			setLoading(false);
+		}
 	}
 
 	return (

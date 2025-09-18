@@ -1,6 +1,8 @@
-export const dynamic = 'force-dynamic';
+"use client";
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { isSupabaseConfigured, supabaseBrowser } from '@/lib/supabase/client';
+import { logoutCustomer } from '@/lib/customer-auth';
 import { Event } from '@/types/db';
 
 async function fetchAcceptedEvents(): Promise<Event[]> {
@@ -34,18 +36,42 @@ async function fetchAcceptedEvents(): Promise<Event[]> {
   }
 }
 
-export default async function CustomerDashboard() {
-  const events = isSupabaseConfigured() ? await fetchAcceptedEvents() : [];
+export default function CustomerDashboard() {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setLoading(false);
+      return;
+    }
+    
+    fetchAcceptedEvents().then(data => {
+      setEvents(data);
+      setLoading(false);
+    });
+  }, []);
+
+  function handleLogout() {
+    logoutCustomer();
+    window.location.href = '/';
+  }
+
   return (
     <main className="container-padded py-6">
       <div className="mb-4">
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-red-600 hover:text-red-700">
+        <button 
+          onClick={handleLogout}
+          className="inline-flex items-center gap-2 text-sm text-red-600 hover:text-red-700"
+        >
           ← Logout
-        </Link>
+        </button>
       </div>
       <h1 className="text-xl font-semibold mb-6">JTI Kunden Dashboard</h1>
       
-      {events.length === 0 ? (
+      {loading ? (
+        <div className="text-center text-gray-500 pt-32">Loading events...</div>
+      ) : events.length === 0 ? (
         <div className="text-center text-gray-500 pt-32">No events available yet.</div>
       ) : (
         <div className="grid grid-cols-7 gap-2">

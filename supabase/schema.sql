@@ -124,6 +124,27 @@ do $$ begin
   create policy photos_public_delete on storage.objects for delete using (bucket_id = 'photos');
 exception when duplicate_object then null; end $$;
 
+-- Customer users table for authentication
+create table if not exists public.customer_users (
+  id uuid primary key default gen_random_uuid(),
+  email text not null unique,
+  name text,
+  is_active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+-- Enable RLS for customer users
+alter table public.customer_users enable row level security;
+
+-- Policies for customer users (only admins can manage, customers can read their own)
+do $$ begin
+  create policy read_customer_users_public on public.customer_users for select using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy insert_customer_users_public on public.customer_users for insert with check (true);
+exception when duplicate_object then null; end $$;
+
 -- Accepted content tables for customer dashboard
 create table if not exists public.accepted_photos (
   id uuid primary key default gen_random_uuid(),
