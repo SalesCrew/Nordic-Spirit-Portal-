@@ -67,6 +67,14 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 do $$ begin
+  create policy update_events_public on public.events for update using (true) with check (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy delete_events_public on public.events for delete using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
   create policy insert_photos on public.photos for insert with check (true);
 exception when duplicate_object then null; end $$;
 
