@@ -117,20 +117,27 @@ export default function ReportingList({ eventFilter }: { eventFilter: string }) 
             setItems((list) => list.map((r) => (r.id === updated.id ? updated : r)));
             setEditing(null);
           }}
+          onDeleted={(deletedId) => {
+            setItems((list) => list.filter((r) => r.id !== deletedId));
+            setEditing(null);
+          }}
         />
       )}
     </section>
   );
 }
 
-function EditReportingModal({ reporting, onClose, onSaved }: {
+function EditReportingModal({ reporting, onClose, onSaved, onDeleted }: {
   reporting: Item;
   onClose: () => void;
   onSaved: (r: Item) => void;
+  onDeleted: (id: string) => void;
 }) {
   const supabase = supabaseBrowser();
   const [answers, setAnswers] = useState(reporting.answers || {});
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [showFrequenzDropdown, setShowFrequenzDropdown] = useState(false);
 
@@ -153,6 +160,19 @@ function EditReportingModal({ reporting, onClose, onSaved }: {
 
   function updateAnswer(key: string, value: string) {
     setAnswers((prev: any) => ({ ...prev, [key]: value }));
+  }
+
+  async function onConfirmDelete() {
+    setDeleting(true);
+    setMessage(null);
+    try {
+      const { error } = await supabase.from('reportings').delete().eq('id', reporting.id);
+      if (error) throw error;
+      onDeleted(reporting.id);
+    } catch (err: any) {
+      setMessage(err?.message ?? 'Failed to delete reporting');
+      setDeleting(false);
+    }
   }
 
   return (
@@ -258,15 +278,35 @@ function EditReportingModal({ reporting, onClose, onSaved }: {
               />
             </div>
             {message && <div className="text-sm text-red-600">{message}</div>}
-            <div className="pt-2 flex items-center justify-end gap-2">
+            <div className="pt-2 flex items-center justify-between gap-2">
               <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>
-              <button type="button" className="btn-gradient" onClick={onSave} disabled={saving}>
-                {saving ? 'Saving...' : 'Save changes'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button type="button" className="btn-danger" onClick={() => setConfirmDelete(true)}>Delete</button>
+                <button type="button" className="btn-gradient" onClick={onSave} disabled={saving}>
+                  {saving ? 'Saving...' : 'Save changes'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </div>
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setConfirmDelete(false)} />
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="card w-full max-w-sm p-4 bg-white">
+              <h4 className="text-md font-semibold mb-2">Delete reporting?</h4>
+              <p className="text-sm text-gray-600 mb-4">This will permanently remove this reporting. This action cannot be undone.</p>
+              <div className="flex items-center justify-end gap-2">
+                <button type="button" className="btn-ghost" onClick={() => setConfirmDelete(false)}>Cancel</button>
+                <button type="button" className="btn-danger" onClick={onConfirmDelete} disabled={deleting}>
+                  {deleting ? 'Deleting...' : 'Confirm delete'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -171,7 +171,7 @@ function EditEventModal({ event, onClose, onSaved, onDeleted }: {
 						<div className="pt-2 flex items-center justify-between gap-2">
 							<button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>
 							<div className="flex items-center gap-2">
-								<button type="button" className="btn-ghost text-red-600" onClick={() => setConfirmDelete(true)}>Delete</button>
+								<button type="button" className="btn-danger" onClick={() => setConfirmDelete(true)}>Delete</button>
 								<button type="button" className="btn-gradient" onClick={onSave} disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</button>
 							</div>
 						</div>
@@ -187,7 +187,7 @@ function EditEventModal({ event, onClose, onSaved, onDeleted }: {
 							<p className="text-sm text-gray-600 mb-4">This will remove the event and its data. This action cannot be undone.</p>
 							<div className="flex items-center justify-end gap-2">
 								<button type="button" className="btn-ghost" onClick={() => setConfirmDelete(false)}>Cancel</button>
-								<button type="button" className="btn-gradient" onClick={onConfirmDelete} disabled={deleting}>{deleting ? 'Deleting...' : 'Confirm delete'}</button>
+								<button type="button" className="btn-danger" onClick={onConfirmDelete} disabled={deleting}>{deleting ? 'Deleting...' : 'Confirm delete'}</button>
 							</div>
 						</div>
 					</div>
