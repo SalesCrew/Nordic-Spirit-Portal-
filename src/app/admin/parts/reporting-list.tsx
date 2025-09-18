@@ -85,7 +85,7 @@ export default function ReportingList({ eventFilter }: { eventFilter: string }) 
       ) : (
         <div className="grid grid-cols-5 gap-3">
           {filtered.map((r) => (
-            <div key={r.id} className="card p-3 rounded-lg relative">
+            <div key={r.id} className={`card p-3 rounded-lg relative ${editing?.id === r.id ? 'shadow-[0_4px_20px_rgba(43,145,255,0.3)]' : ''}`}>
               <button 
                 className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
                 onClick={() => setEditing(r)}
@@ -159,7 +159,7 @@ function EditReportingModal({ reporting, onClose, onSaved }: {
     <div className="fixed inset-0 z-50">
       <div className="absolute inset-0 bg-black/30" onClick={onClose} />
       <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div className="card w-full max-w-md p-4 bg-white max-h-[80vh] overflow-y-auto">
+        <div className="card w-full max-w-md p-4 bg-white max-h-[80vh] overflow-y-auto scrollbar-hide">
           <h3 className="text-lg font-semibold mb-3">Edit Reporting</h3>
           <div className="space-y-3">
             <div>
@@ -252,7 +252,7 @@ function EditReportingModal({ reporting, onClose, onSaved }: {
             <div>
               <label className="label">Anmerkungen</label>
               <textarea
-                className="input min-h-[100px]"
+                className="input min-h-[120px] scrollbar-hide"
                 value={answers.notes || ''}
                 onChange={(e) => updateAnswer('notes', e.target.value)}
               />

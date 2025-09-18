@@ -90,4 +90,13 @@ input[type="date"], input[type="time"], input[type="datetime-local"] {
   background-color: #ffffff;
 }
 
+/* Hide scrollbars while keeping scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
 
