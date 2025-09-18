@@ -26,8 +26,8 @@ export default function ReportingList({ eventFilter }: { eventFilter: string }) 
       const { data: evs } = await supabase
         .from('events')
         .select('id, name');
-      const map = new Map((evs ?? []).map((e) => [e.id, e.name]));
-      const withName = (reps ?? []).map((r) => ({ ...r, event_name: map.get(r.event_id) }));
+      const map = new Map(((evs as any[]) ?? []).map((e) => [e.id, e.name]));
+      const withName = ((reps as any[]) ?? []).map((r) => ({ ...r, event_name: map.get(r.event_id) }));
       setItems(withName);
       setLoading(false);
     })();

@@ -54,7 +54,7 @@ export default function FilterWrapper() {
 				.from('events')
 				.select('id, name, cover_url, created_at, is_active')
 				.order('created_at', { ascending: false });
-			setEvents(data ?? []);
+			setEvents((data as Event[]) ?? []);
 			setLoading(false);
 		})();
 	}, [supabase]);

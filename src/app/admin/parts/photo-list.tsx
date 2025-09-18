@@ -20,8 +20,8 @@ export default function PhotoList({ eventFilter, onChangeEventFilter }: { eventF
         supabase.from('photos').select('id, event_id, storage_path, created_at').order('created_at', { ascending: false }).limit(200),
         supabase.from('events').select('id, name')
       ]);
-      setPhotos(p ?? []);
-      setEvents(e ?? []);
+      setPhotos((p as Photo[]) ?? []);
+      setEvents((e as Event[]) ?? []);
       setLoading(false);
     })();
   }, [supabase]);
