@@ -19,7 +19,12 @@ type Item = {
   event_name?: string;
 };
 
-export default function ReportingList({ eventFilter }: { eventFilter: string }) {
+export default function ReportingList({ eventFilter, kundenMode, selectedReportings, onToggleReporting }: { 
+  eventFilter: string;
+  kundenMode?: boolean;
+  selectedReportings?: Set<string>;
+  onToggleReporting?: (reportingId: string) => void;
+}) {
   const supabase = supabaseBrowser();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -84,29 +89,45 @@ export default function ReportingList({ eventFilter }: { eventFilter: string }) 
         <div className="text-gray-500">No reportings yet.</div>
       ) : (
         <div className="grid grid-cols-5 gap-3">
-          {filtered.map((r) => (
-            <div key={r.id} className={`card p-3 rounded-lg relative ${editing?.id === r.id ? 'shadow-[0_4px_20px_rgba(43,145,255,0.3)]' : ''}`}>
-              <button 
-                className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
-                onClick={() => setEditing(r)}
-                title="Edit reporting"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                  <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-              </button>
-              <div className="text-[11px] text-gray-500 mb-1">{new Date(r.created_at).toLocaleString()}</div>
-              <div className="text-sm font-medium mb-2 line-clamp-1">{r.event_name ?? r.event_id}</div>
-              <div className="space-y-1 text-xs text-gray-700">
-                <div className="flex justify-between"><span className="text-gray-500">Name:</span><span className="truncate max-w-[110px] text-right">{r.answers?.promoter_name ?? '—'}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Datum:</span><span>{r.answers?.work_date ?? '—'}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Zeit:</span><span>{r.answers?.start_time ?? '—'}–{r.answers?.leave_time ?? '—'}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Frequenz:</span><span>{r.answers?.frequenz ?? '—'}</span></div>
-                <div className="flex justify-between"><span className="text-gray-500">Kontakte:</span><span>{r.answers?.kontakte_count ?? '—'}</span></div>
+          {filtered.map((r) => {
+            const isSelected = selectedReportings?.has(r.id) || false;
+            return (
+              <div key={r.id} className={`card p-3 rounded-lg relative ${editing?.id === r.id ? 'shadow-[0_4px_20px_rgba(43,145,255,0.3)]' : ''} ${kundenMode && isSelected ? 'ring-2 ring-blue-500' : ''}`}>
+                {kundenMode && (
+                  <button 
+                    className="absolute top-2 left-2 w-5 h-5 flex items-center justify-center"
+                    onClick={() => onToggleReporting?.(r.id)}
+                    title="Select for customer"
+                  >
+                    <div className={`w-4 h-4 rounded border-2 ${isSelected ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'} flex items-center justify-center`}>
+                      {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>}
+                    </div>
+                  </button>
+                )}
+                {!kundenMode && (
+                  <button 
+                    className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                    onClick={() => setEditing(r)}
+                    title="Edit reporting"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                )}
+                <div className="text-[11px] text-gray-500 mb-1">{new Date(r.created_at).toLocaleString()}</div>
+                <div className="text-sm font-medium mb-2 line-clamp-1">{r.event_name ?? r.event_id}</div>
+                <div className="space-y-1 text-xs text-gray-700">
+                  <div className="flex justify-between"><span className="text-gray-500">Name:</span><span className="truncate max-w-[110px] text-right">{r.answers?.promoter_name ?? '—'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Datum:</span><span>{r.answers?.work_date ?? '—'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Zeit:</span><span>{r.answers?.start_time ?? '—'}–{r.answers?.leave_time ?? '—'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Frequenz:</span><span>{r.answers?.frequenz ?? '—'}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">Kontakte:</span><span>{r.answers?.kontakte_count ?? '—'}</span></div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       {editing && (

@@ -124,4 +124,52 @@ do $$ begin
   create policy photos_public_delete on storage.objects for delete using (bucket_id = 'photos');
 exception when duplicate_object then null; end $$;
 
+-- Accepted content tables for customer dashboard
+create table if not exists public.accepted_photos (
+  id uuid primary key default gen_random_uuid(),
+  photo_id uuid not null references public.photos(id) on delete cascade,
+  event_id uuid not null references public.events(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.accepted_reportings (
+  id uuid primary key default gen_random_uuid(),
+  reporting_id uuid not null references public.reportings(id) on delete cascade,
+  event_id uuid not null references public.events(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+-- Indexes for accepted content
+create index if not exists idx_accepted_photos_event_id on public.accepted_photos(event_id);
+create index if not exists idx_accepted_reportings_event_id on public.accepted_reportings(event_id);
+
+-- Enable RLS for accepted tables
+alter table public.accepted_photos enable row level security;
+alter table public.accepted_reportings enable row level security;
+
+-- Policies for accepted tables
+do $$ begin
+  create policy read_accepted_photos_public on public.accepted_photos for select using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy insert_accepted_photos_public on public.accepted_photos for insert with check (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy delete_accepted_photos_public on public.accepted_photos for delete using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy read_accepted_reportings_public on public.accepted_reportings for select using (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy insert_accepted_reportings_public on public.accepted_reportings for insert with check (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy delete_accepted_reportings_public on public.accepted_reportings for delete using (true);
+exception when duplicate_object then null; end $$;
+
 

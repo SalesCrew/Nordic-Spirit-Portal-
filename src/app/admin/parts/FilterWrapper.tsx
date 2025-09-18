@@ -47,6 +47,9 @@ export default function FilterWrapper() {
 	const [loading, setLoading] = useState(true);
 	const supabase = supabaseBrowser();
 	const [editing, setEditing] = useState<Event | null>(null);
+	const [kundenMode, setKundenMode] = useState(false);
+	const [selectedPhotos, setSelectedPhotos] = useState<Set<string>>(new Set());
+	const [selectedReportings, setSelectedReportings] = useState<Set<string>>(new Set());
 
 	useEffect(() => {
 		(async () => {
@@ -59,8 +62,71 @@ export default function FilterWrapper() {
 		})();
 	}, [supabase]);
 
+	async function submitToCustomer() {
+		if (selectedPhotos.size === 0 && selectedReportings.size === 0) return;
+		
+		try {
+			// Get photos with their event_ids
+			if (selectedPhotos.size > 0) {
+				const { data: photos } = await supabase
+					.from('photos')
+					.select('id, event_id')
+					.in('id', Array.from(selectedPhotos));
+				
+				if (photos) {
+					const photoInserts = photos.map(p => ({
+						photo_id: p.id,
+						event_id: p.event_id
+					}));
+					await supabase.from('accepted_photos').insert(photoInserts);
+				}
+			}
+			
+			// Get reportings with their event_ids
+			if (selectedReportings.size > 0) {
+				const { data: reportings } = await supabase
+					.from('reportings')
+					.select('id, event_id')
+					.in('id', Array.from(selectedReportings));
+				
+				if (reportings) {
+					const reportingInserts = reportings.map(r => ({
+						reporting_id: r.id,
+						event_id: r.event_id
+					}));
+					await supabase.from('accepted_reportings').insert(reportingInserts);
+				}
+			}
+			
+			// Reset selection
+			setSelectedPhotos(new Set());
+			setSelectedReportings(new Set());
+			setKundenMode(false);
+		} catch (err) {
+			console.error('Failed to submit to customer:', err);
+		}
+	}
+
 	return (
 		<div className="space-y-6">
+			<div className="flex items-center justify-between">
+				<div></div>
+				<button 
+					className={`btn-gradient ${kundenMode ? 'opacity-75' : ''}`}
+					onClick={() => setKundenMode(!kundenMode)}
+				>
+					{kundenMode ? 'Kunden Modus beenden' : 'An den Kunden schicken'}
+				</button>
+			</div>
+			
+			{kundenMode && (selectedPhotos.size > 0 || selectedReportings.size > 0) && (
+				<div className="flex justify-end">
+					<button className="btn-gradient" onClick={submitToCustomer}>
+						Auswahl senden ({selectedPhotos.size} Fotos, {selectedReportings.size} Reportings)
+					</button>
+				</div>
+			)}
+			
 			{loading ? (
 				<div className="text-gray-500">Loading events...</div>
 			) : (
@@ -81,8 +147,33 @@ export default function FilterWrapper() {
 					}}
 				/>
 			)}
-			<PhotoList eventFilter={eventFilter} onChangeEventFilter={setEventFilter} />
-			<ReportingList eventFilter={eventFilter} />
+			<PhotoList 
+				eventFilter={eventFilter} 
+				onChangeEventFilter={setEventFilter}
+				kundenMode={kundenMode}
+				selectedPhotos={selectedPhotos}
+				onTogglePhoto={(photoId) => {
+					setSelectedPhotos(prev => {
+						const newSet = new Set(prev);
+						if (newSet.has(photoId)) newSet.delete(photoId);
+						else newSet.add(photoId);
+						return newSet;
+					});
+				}}
+			/>
+			<ReportingList 
+				eventFilter={eventFilter}
+				kundenMode={kundenMode}
+				selectedReportings={selectedReportings}
+				onToggleReporting={(reportingId) => {
+					setSelectedReportings(prev => {
+						const newSet = new Set(prev);
+						if (newSet.has(reportingId)) newSet.delete(reportingId);
+						else newSet.add(reportingId);
+						return newSet;
+					});
+				}}
+			/>
 		</div>
 	);
 }

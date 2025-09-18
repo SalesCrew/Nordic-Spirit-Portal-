@@ -5,7 +5,13 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 type Photo = { id: string; event_id: string; storage_path: string; created_at: string };
 type Event = { id: string; name: string };
 
-export default function PhotoList({ eventFilter, onChangeEventFilter }: { eventFilter: string; onChangeEventFilter: (v: string) => void }) {
+export default function PhotoList({ eventFilter, onChangeEventFilter, kundenMode, selectedPhotos, onTogglePhoto }: { 
+  eventFilter: string; 
+  onChangeEventFilter: (v: string) => void;
+  kundenMode?: boolean;
+  selectedPhotos?: Set<string>;
+  onTogglePhoto?: (photoId: string) => void;
+}) {
   const supabase = supabaseBrowser();
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
@@ -105,11 +111,29 @@ export default function PhotoList({ eventFilter, onChangeEventFilter }: { eventF
           {visible.map((p) => {
             const url = publicUrl(p.storage_path);
             const title = eventIdToName.get(p.event_id) ?? p.event_id;
+            const isSelected = selectedPhotos?.has(p.id) || false;
             return (
-              <a key={p.id} href={url} download className="block relative aspect-square bg-muted rounded-md overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt={title} className="object-cover w-full h-full" />
-              </a>
+              <div key={p.id} className="relative aspect-square bg-muted rounded-md overflow-hidden">
+                {kundenMode ? (
+                  <button 
+                    className={`w-full h-full relative ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
+                    onClick={() => onTogglePhoto?.(p.id)}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={title} className="object-cover w-full h-full" />
+                    <div className="absolute top-2 right-2">
+                      <div className={`w-5 h-5 rounded border-2 ${isSelected ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'} flex items-center justify-center`}>
+                        {isSelected && <div className="w-2 h-2 bg-white rounded-sm"></div>}
+                      </div>
+                    </div>
+                  </button>
+                ) : (
+                  <a href={url} download className="block w-full h-full">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt={title} className="object-cover w-full h-full" />
+                  </a>
+                )}
+              </div>
             );
           })}
         </div>
