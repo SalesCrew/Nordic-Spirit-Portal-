@@ -1,12 +1,10 @@
 "use client";
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { User2 } from 'lucide-react';
-import CustomerLogin from './CustomerLogin';
 
 export default function Header() {
   const timer = useRef<number | null>(null);
-  const [showCustomerLogin, setShowCustomerLogin] = useState(false);
 
   function handlePointerDown() {
     timer.current = window.setTimeout(() => {
@@ -34,13 +32,13 @@ export default function Header() {
           Nordic Spirit Portal
         </div>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setShowCustomerLogin(true)}
+          <Link
+            href="/customer-login"
             className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors opacity-50 hover:opacity-75"
             aria-label="Customer login"
           >
             JTI
-          </button>
+          </Link>
           <Link
             href="/login"
             className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-opacity opacity-60 hover:opacity-100"
@@ -50,9 +48,6 @@ export default function Header() {
           </Link>
         </div>
       </div>
-      {showCustomerLogin && (
-        <CustomerLogin onClose={() => setShowCustomerLogin(false)} />
-      )}
     </header>
   );
 }
