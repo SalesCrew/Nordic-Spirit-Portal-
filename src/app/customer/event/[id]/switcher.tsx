@@ -55,6 +55,17 @@ const FREQUENCIES = [
   { label: 'Sehr schwach', value: 'sehr_schwach' }
 ] as const;
 
+function getFrequenzColor(value: string) {
+  switch (value) {
+    case 'sehr_stark': return 'text-green-600';
+    case 'stark': return 'text-green-500';
+    case 'mittel': return 'text-yellow-600';
+    case 'schwach': return 'text-orange-500';
+    case 'sehr_schwach': return 'text-red-600';
+    default: return 'text-gray-600';
+  }
+}
+
 export default function CustomerEventSwitcher({ eventId }: { eventId: string }) {
   const [tab, setTab] = useState<'photos' | 'reporting'>('photos');
 
@@ -64,8 +75,8 @@ export default function CustomerEventSwitcher({ eventId }: { eventId: string }) 
         <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full">
           <div
             className={
-              `absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out ` +
-              (tab === 'photos' ? 'translate-x-0' : 'translate-x-[calc(100%+4px)]')
+              `absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] ` +
+              (tab === 'photos' ? '' : 'translate-x-[calc(100%+4px)]')
             }
           />
           <button
@@ -103,7 +114,7 @@ export default function CustomerEventSwitcher({ eventId }: { eventId: string }) 
                   <div className="flex justify-between"><span className="text-gray-500 font-medium">Name:</span><span>{r.promoter_name}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500 font-medium">Datum:</span><span>{r.work_date}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500 font-medium">Zeit:</span><span>{r.start_time}–{r.leave_time}</span></div>
-                  <div className="flex justify-between"><span className="text-gray-500 font-medium">Frequenz:</span><span>{FREQUENCIES.find(f => f.value === r.frequenz)?.label || r.frequenz}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500 font-medium">Frequenz:</span><span className={getFrequenzColor(r.frequenz)}>{FREQUENCIES.find(f => f.value === r.frequenz)?.label || r.frequenz}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500 font-medium">Kontakte:</span><span>{r.kontakte_count}</span></div>
                   <div className="flex justify-between"><span className="text-gray-500 font-medium">Pause:</span><span>{r.pause_minutes} min</span></div>
                   <div className="mt-3">
