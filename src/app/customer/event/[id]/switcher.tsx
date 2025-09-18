@@ -64,8 +64,8 @@ export default function CustomerEventSwitcher({ eventId }: { eventId: string }) 
         <div className="relative flex rounded-md border border-border bg-white p-1 select-none w-full">
           <div
             className={
-              `absolute top-1 bottom-1 left-1 w-[calc(50%-2px)] rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out ` +
-              (tab === 'photos' ? 'translate-x-0' : 'translate-x-[calc(100%+2px)]')
+              `absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md bg-muted shadow-[inset_0_0_0_1px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-out ` +
+              (tab === 'photos' ? 'translate-x-0' : 'translate-x-[calc(100%+4px)]')
             }
           />
           <button
