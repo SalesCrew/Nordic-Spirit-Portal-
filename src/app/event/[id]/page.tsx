@@ -13,7 +13,7 @@ async function fetchEvent(id: string): Promise<Event | null> {
       .select('id, name, cover_url, created_at, is_active')
       .eq('id', id)
       .single();
-    return data ?? null;
+    return (data as Event) ?? null;
   } catch {
     return null;
   }

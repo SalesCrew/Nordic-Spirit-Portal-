@@ -10,7 +10,7 @@ async function fetchEvents(): Promise<Event[]> {
       .from('events')
       .select('id, name, cover_url, created_at, is_active')
       .order('created_at', { ascending: false });
-    return data ?? [];
+    return (data as Event[]) ?? [];
   } catch {
     return [];
   }
