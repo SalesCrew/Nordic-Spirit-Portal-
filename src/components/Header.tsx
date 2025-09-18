@@ -48,10 +48,10 @@ export default function Header() {
             <User2 size={18} />
           </Link>
         </div>
-        {showCustomerLogin && (
-          <CustomerLoginModal onClose={() => setShowCustomerLogin(false)} />
-        )}
       </div>
+      {showCustomerLogin && (
+        <CustomerLoginModal onClose={() => setShowCustomerLogin(false)} />
+      )}
     </header>
   );
 }
@@ -71,10 +71,10 @@ function CustomerLoginModal({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+    <div className="fixed inset-0 z-[9999]">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <div className="absolute inset-0 flex items-center justify-center p-4">
-        <div className="card w-full max-w-sm p-4 bg-white">
+        <div className="card w-full max-w-sm p-4 bg-white relative z-[10000] shadow-2xl">
           <h3 className="text-lg font-semibold mb-3">Customer Login</h3>
           <form onSubmit={onSubmit} className="space-y-3">
             <div>
