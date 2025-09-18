@@ -176,6 +176,7 @@ function EditEventModal({ event, onClose, onSaved, onDeleted }: {
 							</div>
 						</div>
 					</div>
+				</div>
 			</div>
 			{confirmDelete && (
 				<div className="fixed inset-0 z-50">
