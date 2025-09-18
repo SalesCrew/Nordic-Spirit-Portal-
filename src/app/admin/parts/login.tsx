@@ -22,9 +22,32 @@ export default function AdminLogin() {
 		e.preventDefault();
 		setLoading(true);
 		setMessage(null);
-		const { error } = await supabase.auth.signInWithPassword({ email, password });
-		if (error) setMessage(error.message);
-		else setMessage('Logged in');
+		
+		try {
+			// Check if email exists in customer_users table (block if it does)
+			const { data: customerUser } = await supabase
+				.from('customer_users')
+				.select('email')
+				.eq('email', email)
+				.single();
+			
+			if (customerUser) {
+				setMessage('Access denied. Customer accounts cannot access admin panel.');
+				setLoading(false);
+				return;
+			}
+			
+			// Proceed with admin login
+			const { error } = await supabase.auth.signInWithPassword({ email, password });
+			if (error) setMessage(error.message);
+			else setMessage('Logged in');
+		} catch (err: any) {
+			// If customer check fails, proceed with normal login (customer not found is OK)
+			const { error } = await supabase.auth.signInWithPassword({ email, password });
+			if (error) setMessage(error.message);
+			else setMessage('Logged in');
+		}
+		
 		setLoading(false);
 	}
 
