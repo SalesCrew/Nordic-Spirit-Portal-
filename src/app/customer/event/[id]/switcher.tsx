@@ -108,7 +108,9 @@ export default function CustomerEventSwitcher({ eventId }: { eventId: string }) 
                   <div className="flex justify-between"><span className="text-gray-500 font-medium">Pause:</span><span>{r.pause_minutes} min</span></div>
                   <div className="mt-3">
                     <div className="text-gray-500 font-medium text-xs mb-1">Anmerkungen:</div>
-                    <div className="text-xs text-gray-600 leading-relaxed scrollbar-hide max-h-24 overflow-y-auto">{r.notes}</div>
+                    <div className="bg-gray-100/70 rounded-md p-2">
+                      <div className="text-xs text-gray-600 leading-relaxed scrollbar-hide max-h-24 overflow-y-auto">{r.notes}</div>
+                    </div>
                   </div>
                 </div>
               </div>

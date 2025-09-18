@@ -13,7 +13,9 @@ export default function CustomerDashboard() {
   return (
     <main className="container-padded py-6">
       <div className="mb-4">
-        <Link href="/" className="btn-danger text-sm">Logout</Link>
+        <Link href="/" className="inline-flex items-center gap-2 text-sm text-red-600 hover:text-red-700">
+          ← Logout
+        </Link>
       </div>
       <h1 className="text-xl font-semibold mb-6">JTI Kunden Dashboard</h1>
       
