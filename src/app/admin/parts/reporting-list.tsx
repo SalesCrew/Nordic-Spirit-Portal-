@@ -3,6 +3,14 @@ import { useEffect, useState } from 'react';
 import * as XLSX from 'xlsx';
 import { supabaseBrowser } from '@/lib/supabase/client';
 
+const FREQUENCIES = [
+  { label: 'Sehr stark', value: 'sehr_stark' },
+  { label: 'Stark', value: 'stark' },
+  { label: 'Mittel', value: 'mittel' },
+  { label: 'Schwach', value: 'schwach' },
+  { label: 'Sehr schwach', value: 'sehr_schwach' }
+] as const;
+
 type Item = {
   id: string;
   event_id: string;
@@ -15,6 +23,7 @@ export default function ReportingList({ eventFilter }: { eventFilter: string }) 
   const supabase = supabaseBrowser();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Item | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -76,7 +85,17 @@ export default function ReportingList({ eventFilter }: { eventFilter: string }) 
       ) : (
         <div className="grid grid-cols-5 gap-3">
           {filtered.map((r) => (
-            <div key={r.id} className="card p-3 rounded-lg">
+            <div key={r.id} className="card p-3 rounded-lg relative">
+              <button 
+                className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                onClick={() => setEditing(r)}
+                title="Edit reporting"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
               <div className="text-[11px] text-gray-500 mb-1">{new Date(r.created_at).toLocaleString()}</div>
               <div className="text-sm font-medium mb-2 line-clamp-1">{r.event_name ?? r.event_id}</div>
               <div className="space-y-1 text-xs text-gray-700">
@@ -90,7 +109,165 @@ export default function ReportingList({ eventFilter }: { eventFilter: string }) 
           ))}
         </div>
       )}
+      {editing && (
+        <EditReportingModal
+          reporting={editing}
+          onClose={() => setEditing(null)}
+          onSaved={(updated) => {
+            setItems((list) => list.map((r) => (r.id === updated.id ? updated : r)));
+            setEditing(null);
+          }}
+        />
+      )}
     </section>
+  );
+}
+
+function EditReportingModal({ reporting, onClose, onSaved }: {
+  reporting: Item;
+  onClose: () => void;
+  onSaved: (r: Item) => void;
+}) {
+  const supabase = supabaseBrowser();
+  const [answers, setAnswers] = useState(reporting.answers || {});
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [showFrequenzDropdown, setShowFrequenzDropdown] = useState(false);
+
+  async function onSave() {
+    setSaving(true);
+    setMessage(null);
+    try {
+      const { error } = await supabase
+        .from('reportings')
+        .update({ answers })
+        .eq('id', reporting.id);
+      if (error) throw error;
+      onSaved({ ...reporting, answers });
+    } catch (err: any) {
+      setMessage(err?.message ?? 'Failed to save changes');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function updateAnswer(key: string, value: string) {
+    setAnswers((prev: any) => ({ ...prev, [key]: value }));
+  }
+
+  return (
+    <div className="fixed inset-0 z-50">
+      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
+      <div className="absolute inset-0 flex items-center justify-center p-4">
+        <div className="card w-full max-w-md p-4 bg-white max-h-[80vh] overflow-y-auto">
+          <h3 className="text-lg font-semibold mb-3">Edit Reporting</h3>
+          <div className="space-y-3">
+            <div>
+              <label className="label">Name Mitarbeiter</label>
+              <input
+                className="input"
+                value={answers.promoter_name || ''}
+                onChange={(e) => updateAnswer('promoter_name', e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="label">Datum</label>
+              <input
+                className="input"
+                type="date"
+                value={answers.work_date || ''}
+                onChange={(e) => updateAnswer('work_date', e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label">Dienstbeginn</label>
+                <input
+                  className="input"
+                  value={answers.start_time || ''}
+                  onChange={(e) => updateAnswer('start_time', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Uhrzeit verlassen</label>
+                <input
+                  className="input"
+                  value={answers.leave_time || ''}
+                  onChange={(e) => updateAnswer('leave_time', e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="label">Frequenz</label>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="input w-full text-left flex items-center justify-between"
+                  onClick={() => setShowFrequenzDropdown(!showFrequenzDropdown)}
+                >
+                  <span>{FREQUENCIES.find(f => f.value === answers.frequenz)?.label || answers.frequenz || 'Select...'}</span>
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" className="text-gray-500">
+                    <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                {showFrequenzDropdown && (
+                  <div className="absolute top-full mt-1 w-full bg-white border border-border rounded-md shadow-lg z-10">
+                    {FREQUENCIES.map((freq) => (
+                      <button
+                        key={freq.value}
+                        type="button"
+                        className="w-full px-3 py-2 text-left text-sm hover:bg-gradient-to-r hover:from-[#2B91FF]/50 hover:to-[#0047FF]/50"
+                        onClick={() => {
+                          updateAnswer('frequenz', freq.value);
+                          setShowFrequenzDropdown(false);
+                        }}
+                      >
+                        {freq.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="label">Anzahl Kontakte</label>
+                <input
+                  className="input"
+                  type="number"
+                  value={answers.kontakte_count || ''}
+                  onChange={(e) => updateAnswer('kontakte_count', e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="label">Pause (Minuten)</label>
+                <input
+                  className="input"
+                  type="number"
+                  value={answers.pause_minutes || ''}
+                  onChange={(e) => updateAnswer('pause_minutes', e.target.value)}
+                />
+              </div>
+            </div>
+            <div>
+              <label className="label">Anmerkungen</label>
+              <textarea
+                className="input min-h-[100px]"
+                value={answers.notes || ''}
+                onChange={(e) => updateAnswer('notes', e.target.value)}
+              />
+            </div>
+            {message && <div className="text-sm text-red-600">{message}</div>}
+            <div className="pt-2 flex items-center justify-end gap-2">
+              <button type="button" className="btn-ghost" onClick={onClose}>Cancel</button>
+              <button type="button" className="btn-gradient" onClick={onSave} disabled={saving}>
+                {saving ? 'Saving...' : 'Save changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

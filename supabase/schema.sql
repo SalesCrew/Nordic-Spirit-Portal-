@@ -90,6 +90,14 @@ do $$ begin
   create policy insert_reportings on public.reportings for insert with check (true);
 exception when duplicate_object then null; end $$;
 
+do $$ begin
+  create policy update_reportings_public on public.reportings for update using (true) with check (true);
+exception when duplicate_object then null; end $$;
+
+do $$ begin
+  create policy delete_reportings_public on public.reportings for delete using (true);
+exception when duplicate_object then null; end $$;
+
 -- TEMP: allow reading photos/reportings until admin auth is added
 do $$ begin
   create policy read_photos_public on public.photos for select using (true);
