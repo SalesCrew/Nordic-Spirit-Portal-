@@ -1,15 +1,41 @@
 export const dynamic = 'force-dynamic';
 import Link from 'next/link';
+import { isSupabaseConfigured, supabaseBrowser } from '@/lib/supabase/client';
+import { Event } from '@/types/db';
 
-// Temp data for frontend
-const tempEvents = [
-  { id: '1', name: 'Summer Campaign 2024', cover_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop' },
-  { id: '2', name: 'Winter Promotion', cover_url: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=300&fit=crop' },
-  { id: '3', name: 'Spring Launch', cover_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop' },
-  { id: '4', name: 'Autumn Festival', cover_url: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=300&fit=crop' },
-];
+async function fetchAcceptedEvents(): Promise<Event[]> {
+  try {
+    const supabase = supabaseBrowser();
+    
+    // Get events that have accepted photos or reportings
+    const [{ data: photoEventIds }, { data: reportingEventIds }] = await Promise.all([
+      supabase.from('accepted_photos').select('event_id'),
+      supabase.from('accepted_reportings').select('event_id')
+    ]);
+    
+    const allEventIds = [
+      ...(photoEventIds ?? []).map(item => item.event_id),
+      ...(reportingEventIds ?? []).map(item => item.event_id)
+    ];
+    
+    if (allEventIds.length === 0) return [];
+    
+    const uniqueEventIds = [...new Set(allEventIds)];
+    
+    const { data: events } = await supabase
+      .from('events')
+      .select('id, name, cover_url, created_at, is_active')
+      .in('id', uniqueEventIds)
+      .order('created_at', { ascending: false });
+    
+    return (events as Event[]) ?? [];
+  } catch {
+    return [];
+  }
+}
 
-export default function CustomerDashboard() {
+export default async function CustomerDashboard() {
+  const events = isSupabaseConfigured() ? await fetchAcceptedEvents() : [];
   return (
     <main className="container-padded py-6">
       <div className="mb-4">
@@ -19,25 +45,33 @@ export default function CustomerDashboard() {
       </div>
       <h1 className="text-xl font-semibold mb-6">JTI Kunden Dashboard</h1>
       
-      <div className="grid grid-cols-7 gap-2">
-        {tempEvents.map((event) => (
-          <Link key={event.id} href={`/customer/event/${event.id}`} className="block">
-            <div className="card overflow-hidden">
-              <div className="aspect-[4/3] bg-muted relative">
-                <img
-                  src={event.cover_url}
-                  alt={event.name}
-                  className="object-cover w-full h-full"
-                />
+      {events.length === 0 ? (
+        <div className="text-center text-gray-500 pt-32">No events available yet.</div>
+      ) : (
+        <div className="grid grid-cols-7 gap-2">
+          {events.map((event) => (
+            <Link key={event.id} href={`/customer/event/${event.id}`} className="block">
+              <div className="card overflow-hidden">
+                <div className="aspect-[4/3] bg-muted relative">
+                  {event.cover_url ? (
+                    <img
+                      src={event.cover_url}
+                      alt={event.name}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 grid place-items-center text-gray-300 text-xs">No cover</div>
+                  )}
+                </div>
+                <div className="p-2">
+                  <div className="text-xs text-gray-500">Event</div>
+                  <div className="text-sm font-medium truncate" title={event.name}>{event.name}</div>
+                </div>
               </div>
-              <div className="p-2">
-                <div className="text-xs text-gray-500">Event</div>
-                <div className="text-sm font-medium truncate" title={event.name}>{event.name}</div>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </main>
   );
 }

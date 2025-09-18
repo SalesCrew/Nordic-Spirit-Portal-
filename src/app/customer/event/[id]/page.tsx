@@ -1,17 +1,26 @@
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { isSupabaseConfigured, supabaseBrowser } from '@/lib/supabase/client';
+import { Event } from '@/types/db';
 import CustomerEventSwitcher from './switcher';
 
-// Temp data for frontend
-const tempEvents = [
-  { id: '1', name: 'Summer Campaign 2024' },
-  { id: '2', name: 'Winter Promotion' },
-  { id: '3', name: 'Spring Launch' },
-  { id: '4', name: 'Autumn Festival' },
-];
+async function fetchEvent(id: string): Promise<Event | null> {
+  try {
+    const supabase = supabaseBrowser();
+    const { data } = await supabase
+      .from('events')
+      .select('id, name, cover_url, created_at, is_active')
+      .eq('id', id)
+      .single();
+    return (data as Event) ?? null;
+  } catch {
+    return null;
+  }
+}
 
-export default function CustomerEventPage({ params }: { params: { id: string } }) {
-  const event = tempEvents.find(e => e.id === params.id);
+export default async function CustomerEventPage({ params }: { params: { id: string } }) {
+  const event = isSupabaseConfigured() ? await fetchEvent(params.id) : null;
   if (!event) return <div className="container-padded py-6">Event not found.</div>;
   
   return (
