@@ -65,14 +65,38 @@ export default function PhotoUpload({ eventId }: { eventId: string }) {
           ref={inputRef}
         />
       </div>
+      
+      {pendingFiles.length > 0 && (
+        <div className="mb-3">
+          <div className="text-xs text-gray-500 mb-2">{pendingFiles.length} file(s) ready to upload:</div>
+          <div className="grid grid-cols-4 gap-2">
+            {pendingFiles.map((file, idx) => (
+              <div key={idx} className="relative aspect-square overflow-hidden rounded-md bg-muted border-2 border-dashed border-blue-300">
+                <img 
+                  src={URL.createObjectURL(file)} 
+                  alt={file.name} 
+                  className="object-cover w-full h-full opacity-75" 
+                />
+                <div className="absolute inset-0 bg-blue-500/10 flex items-center justify-center">
+                  <div className="text-xs text-blue-600 font-medium">Ready</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {uploaded.length > 0 && (
-        <div className="grid grid-cols-3 gap-2">
-          {uploaded.map((u) => (
-            <div key={u.id} className="relative aspect-square overflow-hidden rounded-md bg-muted">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={u.url} alt="uploaded" className="object-cover w-full h-full" />
-            </div>
-          ))}
+        <div className="mb-3">
+          <div className="text-xs text-gray-500 mb-2">Recently uploaded:</div>
+          <div className="grid grid-cols-3 gap-2">
+            {uploaded.map((u) => (
+              <div key={u.id} className="relative aspect-square overflow-hidden rounded-md bg-muted">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={u.url} alt="uploaded" className="object-cover w-full h-full" />
+              </div>
+            ))}
+          </div>
         </div>
       )}
       <div className="mt-3 flex items-center justify-end gap-2 w-full">
