@@ -24,14 +24,33 @@ export default function AdminLogin() {
 		setMessage(null);
 		
 		// ROBUST CHECK: Block if email exists in customer_users table (case-insensitive)
+		console.log('Checking email:', email);
+		
+		// Check BOTH active and inactive customer users
 		const { data: customerUsers, error: queryError } = await supabase
 			.from('customer_users')
-			.select('email')
-			.ilike('email', email)
-			.eq('is_active', true);
+			.select('email, is_active')
+			.ilike('email', email);
 		
-		// If query succeeded and found any matching users, BLOCK
+		console.log('Query result:', { customerUsers, queryError });
+		
+		// If query succeeded and found ANY matching users (active or not), BLOCK
 		if (!queryError && customerUsers && customerUsers.length > 0) {
+			console.log('BLOCKING: Found customer user');
+			setMessage('Access denied. Customer accounts cannot access admin panel.');
+			setLoading(false);
+			return;
+		}
+		
+		// Also check with trimmed and lowercase email
+		const trimmedEmail = email.trim();
+		const { data: customerUsers2 } = await supabase
+			.from('customer_users')
+			.select('email')
+			.ilike('email', trimmedEmail);
+			
+		if (customerUsers2 && customerUsers2.length > 0) {
+			console.log('BLOCKING: Found customer user (trimmed check)');
 			setMessage('Access denied. Customer accounts cannot access admin panel.');
 			setLoading(false);
 			return;
