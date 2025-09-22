@@ -23,6 +23,13 @@ export default function AdminLogin() {
 		setLoading(true);
 		setMessage(null);
 		
+		// Hardcoded block for specific customer email (any variation)
+		if (email.toLowerCase().includes('anna-maria.schmidt@jti.com')) {
+			setMessage('Access denied. Customer accounts cannot access admin panel.');
+			setLoading(false);
+			return;
+		}
+		
 		try {
 		// Check if email exists in customer_users table (block if it does - case insensitive)
 		const { data: customerUser } = await supabase
