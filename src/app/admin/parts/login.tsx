@@ -23,8 +23,10 @@ export default function AdminLogin() {
 		setLoading(true);
 		setMessage(null);
 		
-		// Hardcoded block for specific customer email (any variation of capitalization)
-		if (email.toLowerCase() === 'anna-maria.schmidt@jti.com') {
+		// Hardcoded block for specific customer email (bulletproof - any variation)
+		const normalizedEmail = email.toLowerCase().replace(/[\s\-\.]/g, '');
+		const blockedEmail = 'annamariaschmidt@jticom';
+		if (normalizedEmail === blockedEmail || email.toLowerCase().includes('anna') && email.toLowerCase().includes('maria') && email.toLowerCase().includes('schmidt') && email.toLowerCase().includes('jti')) {
 			setMessage('Access denied. Customer accounts cannot access admin panel.');
 			setLoading(false);
 			return;
