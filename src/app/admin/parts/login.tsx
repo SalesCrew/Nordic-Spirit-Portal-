@@ -23,40 +23,26 @@ export default function AdminLogin() {
 		setLoading(true);
 		setMessage(null);
 		
-		// Block ANY email containing banned words (anna, maria, jti) - super aggressive
-		const cleanEmail = email.toLowerCase().replace(/[\s\-\.@]/g, '');
-		const bannedWords = ['anna', 'maria', 'jti'];
-		const containsBannedWord = bannedWords.some(word => cleanEmail.includes(word));
+		// ROBUST CHECK: Block if email exists in customer_users table (case-insensitive)
+		const { data: customerUsers, error: queryError } = await supabase
+			.from('customer_users')
+			.select('email')
+			.ilike('email', email)
+			.eq('is_active', true);
 		
-		if (containsBannedWord) {
+		// If query succeeded and found any matching users, BLOCK
+		if (!queryError && customerUsers && customerUsers.length > 0) {
 			setMessage('Access denied. Customer accounts cannot access admin panel.');
 			setLoading(false);
 			return;
 		}
 		
-		try {
-		// Check if email exists in customer_users table (block if it does - case insensitive)
-		const { data: customerUser } = await supabase
-			.from('customer_users')
-			.select('email')
-			.ilike('email', email)
-			.single();
-			
-			if (customerUser) {
-				setMessage('Access denied. Customer accounts cannot access admin panel.');
-				setLoading(false);
-				return;
-			}
-			
-			// Proceed with admin login
-			const { error } = await supabase.auth.signInWithPassword({ email, password });
-			if (error) setMessage(error.message);
-			else setMessage('Logged in');
-		} catch (err: any) {
-			// If customer check fails, proceed with normal login (customer not found is OK)
-			const { error } = await supabase.auth.signInWithPassword({ email, password });
-			if (error) setMessage(error.message);
-			else setMessage('Logged in');
+		// Only proceed with login if NOT a customer user
+		const { error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+		if (loginError) {
+			setMessage(loginError.message);
+		} else {
+			setMessage('Logged in');
 		}
 		
 		setLoading(false);
