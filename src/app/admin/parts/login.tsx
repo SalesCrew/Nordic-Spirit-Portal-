@@ -24,12 +24,12 @@ export default function AdminLogin() {
 		setMessage(null);
 		
 		try {
-			// Check if email exists in customer_users table (block if it does)
-			const { data: customerUser } = await supabase
-				.from('customer_users')
-				.select('email')
-				.eq('email', email)
-				.single();
+		// Check if email exists in customer_users table (block if it does - case insensitive)
+		const { data: customerUser } = await supabase
+			.from('customer_users')
+			.select('email')
+			.ilike('email', email)
+			.single();
 			
 			if (customerUser) {
 				setMessage('Access denied. Customer accounts cannot access admin panel.');

@@ -17,11 +17,11 @@ export default function CustomerLoginPage() {
 		setError(null);
 		
 		try {
-			// Check if user exists in customer_users table
+			// Check if user exists in customer_users table (case-insensitive)
 			const { data: customerUser, error: queryError } = await supabase
 				.from('customer_users')
 				.select('id, email, is_active')
-				.eq('email', email)
+				.ilike('email', email)
 				.eq('is_active', true)
 				.single();
 			
