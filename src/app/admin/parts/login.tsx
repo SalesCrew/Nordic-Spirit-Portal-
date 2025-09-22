@@ -10,6 +10,9 @@ export default function AdminLogin() {
 	const [message, setMessage] = useState<string | null>(null);
 	const supabase = supabaseBrowser();
 
+	// Check if email matches blocked customer email (case-insensitive)
+	const isCustomerEmail = email.toLowerCase() === 'anna-maria.schmidt@jti.com';
+
 	useEffect(() => {
 		const onKey = (e: KeyboardEvent) => {
 			if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'l') setShow((s) => !s);
@@ -75,10 +78,17 @@ export default function AdminLogin() {
 				<input className="input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
 				<input className="input" placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
 				<div className="col-span-2 flex justify-end">
-					<button className="btn-gradient" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
+					<button 
+						className={`btn-gradient ${isCustomerEmail ? 'opacity-30 cursor-not-allowed' : ''}`} 
+						disabled={loading || isCustomerEmail}
+						title={isCustomerEmail ? 'Customer accounts cannot access admin panel' : ''}
+					>
+						{loading ? 'Logging in...' : 'Login'}
+					</button>
 				</div>
 			</form>
 			{message && <div className="text-xs text-gray-500 mt-2">{message}</div>}
+			{isCustomerEmail && <div className="text-xs text-red-500 mt-2">Customer accounts cannot access admin panel</div>}
 			<div className="text-xs text-gray-400 mt-1">Press Ctrl+Shift+L to toggle</div>
 		</div>
 	);
