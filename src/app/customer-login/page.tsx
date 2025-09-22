@@ -18,12 +18,19 @@ export default function CustomerLoginPage() {
 		
 		try {
 			// Check if user exists in customer_users table
-			const { data: customerUser } = await supabase
+			const { data: customerUser, error: queryError } = await supabase
 				.from('customer_users')
 				.select('id, email, is_active')
 				.eq('email', email)
 				.eq('is_active', true)
 				.single();
+			
+			if (queryError) {
+				console.error('Query error:', queryError);
+				setError('Access denied. Please contact your administrator.');
+				setLoading(false);
+				return;
+			}
 			
 			if (!customerUser) {
 				setError('Access denied. Please contact your administrator.');
@@ -36,6 +43,7 @@ export default function CustomerLoginPage() {
 			sessionStorage.setItem('customer_user', JSON.stringify(customerUser));
 			router.replace('/customer');
 		} catch (err: any) {
+			console.error('Customer login error:', err);
 			setError('Access denied. Please contact your administrator.');
 			setLoading(false);
 		}
