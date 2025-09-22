@@ -11,6 +11,9 @@ export default function LoginPage() {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	// Check if email matches blocked customer email (case-insensitive)
+	const isCustomerEmail = email.toLowerCase() === 'anna-maria.schmidt@jti.com';
+
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		setLoading(true);
@@ -57,8 +60,15 @@ export default function LoginPage() {
 					<input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
 				</div>
 				{error && <div className="text-sm text-red-600">{error}</div>}
+				{isCustomerEmail && <div className="text-sm text-red-600">Customer accounts cannot access admin panel</div>}
 				<div className="flex justify-end pt-2">
-					<button className="btn-gradient" disabled={loading}>{loading ? 'Logging in...' : 'Login'}</button>
+					<button 
+						className={`btn-gradient ${isCustomerEmail ? 'opacity-30 cursor-not-allowed' : ''}`} 
+						disabled={loading || isCustomerEmail}
+						title={isCustomerEmail ? 'Customer accounts cannot access admin panel' : ''}
+					>
+						{loading ? 'Logging in...' : 'Login'}
+					</button>
 				</div>
 			</form>
 		</main>
