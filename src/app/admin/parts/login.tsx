@@ -23,10 +23,12 @@ export default function AdminLogin() {
 		setLoading(true);
 		setMessage(null);
 		
-		// Hardcoded block for specific customer email (bulletproof - any variation)
-		const normalizedEmail = email.toLowerCase().replace(/[\s\-\.]/g, '');
-		const blockedEmail = 'annamariaschmidt@jticom';
-		if (normalizedEmail === blockedEmail || email.toLowerCase().includes('anna') && email.toLowerCase().includes('maria') && email.toLowerCase().includes('schmidt') && email.toLowerCase().includes('jti')) {
+		// Block ANY email containing banned words (anna, maria, jti) - super aggressive
+		const cleanEmail = email.toLowerCase().replace(/[\s\-\.@]/g, '');
+		const bannedWords = ['anna', 'maria', 'jti'];
+		const containsBannedWord = bannedWords.some(word => cleanEmail.includes(word));
+		
+		if (containsBannedWord) {
 			setMessage('Access denied. Customer accounts cannot access admin panel.');
 			setLoading(false);
 			return;
